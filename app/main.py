@@ -5,9 +5,12 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
-# Dummy user and admin store (use database in production)
+# Dummy user and admin store
 users = {}
-admin = {"username": os.getenv("ADMIN_USERNAME", "PAKADMINLOGIN"), "password": os.getenv("ADMIN_PASSWORD", "24113576")}
+admin = {
+    "username": os.getenv("ADMIN_USERNAME", "PAKADMINLOGIN"),
+    "password": os.getenv("ADMIN_PASSWORD", "24113576")
+}
 user_coins = {}
 sms_logs = []
 ip_blocked = {}
@@ -38,16 +41,19 @@ def login():
         if users.get(phone) == password:
             session["user"] = phone
             return redirect("/dashboard")
-        flash("Invalid credentials.")
+        else:
+            flash("Invalid credentials.")
     return render_template("login.html")
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
-        if request.form["username"] == admin["username"] and request.form["password"] == admin["password"]:
+        if (request.form["username"] == admin["username"] and
+                request.form["password"] == admin["password"]):
             session["admin"] = True
             return redirect("/admin")
-        flash("Invalid admin login.")
+        else:
+            flash("Invalid admin credentials.")
     return render_template("admin_login.html")
 
 @app.route("/dashboard", methods=["GET", "POST"])
@@ -59,9 +65,9 @@ def dashboard():
     ip = request.remote_addr
     now = datetime.now()
 
-    # Check IP block
+    # IP block check
     if ip in ip_blocked and ip_blocked[ip] > now:
-        return f"⛔ Your IP is temporarily blocked. Try again later."
+        return f"🚫 Your IP is temporarily blocked. Try again later."
 
     if request.method == "POST":
         number = request.form["number"]
@@ -71,13 +77,19 @@ def dashboard():
         else:
             # Simulate sending SMS
             user_coins[user] -= 1
-            sms_logs.append({"user": user, "to": number, "msg": message, "time": now.strftime("%Y-%m-%d %H:%M:%S"), "ip": ip})
+            sms_logs.append({
+                "user": user,
+                "to": number,
+                "msg": message,
+                "time": now,
+                "ip": ip
+            })
             flash("✅ SMS sent.")
 
-        # IP Abuse Check
-        recent = [log for log in sms_logs if log["ip"] == ip and (now - datetime.strptime(log["time"], "%Y-%m-%d %H:%M:%S")).seconds < 60]
-        if len(recent) >= 5:
-            ip_blocked[ip] = now + timedelta(hours=2)
+            # Abuse protection
+            recent = [log for log in sms_logs if log["ip"] == ip and now - log["time"] < timedelta(hours=1)]
+            if len(recent) >= 5:
+                ip_blocked[ip] = now + timedelta(hours=2)
 
     coins = user_coins.get(user, 0)
     return render_template("dashboard.html", coins=coins)
@@ -86,7 +98,7 @@ def dashboard():
 def admin_panel():
     if not session.get("admin"):
         return redirect("/admin/login")
-    return render_template("admin.html", users=users, coins=user_coins, logs=sms_logs, ip_blocked=ip_blocked)
+    return render_template("admin.html", users=users, coins=user_coins, logs=sms_logs)
 
 @app.route("/admin/add_coins", methods=["POST"])
 def add_coins():
@@ -97,3 +109,6 @@ def add_coins():
     user_coins[phone] = user_coins.get(phone, 0) + amount
     flash(f"Added {amount} coins to {phone}")
     return redirect("/admin")
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=3000)
