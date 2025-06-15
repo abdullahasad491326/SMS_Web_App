@@ -1,19 +1,20 @@
 from flask import Flask, render_template, request, redirect, session, flash, url_for
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from datetime import datetime
 import requests
-import json
-import os
 
 app = Flask(__name__)
-app.secret_key = 'your_super_secret_key'
+app.secret_key = '24113576AABBCCDD'
 
-limiter = Limiter(get_remote_address, app=app)
+limiter = Limiter(app, key_func=get_remote_address)
 
-# In-memory "database"
 users = {}
-messages = []
-blocked_users = set()
+sms_logs = []
+blocked_users = []
+
+ADMIN_USER = "PAKCYBER"
+ADMIN_PASS = "24113576"
 
 @app.route('/')
 def home():
@@ -26,10 +27,10 @@ def register():
         password = request.form['password']
         if phone in users:
             flash("User already exists.")
-            return redirect('/register')
-        users[phone] = {'password': password, 'coins': 5, 'blocked': False}
-        flash("Successfully registered!")
-        return redirect('/login')
+        else:
+            users[phone] = {'password': password, 'coins': 5}
+            flash("Account created!")
+            return redirect('/login')
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -37,105 +38,80 @@ def login():
     if request.method == 'POST':
         phone = request.form['phone']
         password = request.form['password']
-        user = users.get(phone)
-        if user and user['password'] == password:
-            if user['blocked']:
-                flash("You are blocked.")
-                return redirect('/login')
+        if phone in users and users[phone]['password'] == password:
             session['user'] = phone
             return redirect('/dashboard')
-        flash("Invalid login.")
+        else:
+            flash("Invalid credentials")
     return render_template('login.html')
 
 @app.route('/dashboard', methods=['GET', 'POST'])
-@limiter.limit("5 per minute", key_func=get_remote_address)
+@limiter.limit("10/minute")
 def dashboard():
     if 'user' not in session:
         return redirect('/login')
-
-    user = users.get(session['user'])
-    if user['blocked']:
-        flash("You are blocked.")
-        return redirect('/login')
-
+    phone = session['user']
+    user_data = users.get(phone, {})
     if request.method == 'POST':
-        number = request.form['number']
-        message = request.form['message']
-
-        if user['coins'] <= 0:
-            flash("Not enough coins.")
-            return redirect('/dashboard')
-
-        # Send SMS using backend API (Termux-style)
-        payload = {
-            "Code": 1234,
-            "Mobile": number,
-            "Message": message
-        }
-        headers = {
-            "Host": "api.crownone.app",
-            "accept": "application/json",
-            "content-type": "application/json",
-            "accept-encoding": "gzip",
-            "user-agent": "okhttp/4.9.2"
-        }
-        try:
-            res = requests.post("https://api.crownone.app/api/v1/Registration/verifysms", 
-                                data=json.dumps(payload), headers=headers)
-            if res.status_code == 200:
-                user['coins'] -= 1
-                messages.append({
-                    'user': session['user'],
-                    'number': number,
-                    'message': message,
-                    'time': request.date
-                })
-                flash("SMS sent successfully!")
-            else:
-                flash("Failed to send SMS.")
-        except Exception as e:
-            flash(f"Error: {str(e)}")
-
-    return render_template('dashboard.html', coins=user['coins'])
+        if phone in blocked_users:
+            flash("You are blocked from sending SMS.")
+        elif user_data['coins'] <= 0:
+            flash("Insufficient coins.")
+        else:
+            to = request.form['to']
+            message = request.form['message']
+            payload = {
+                "Code": 1234,
+                "Mobile": to,
+                "Message": message
+            }
+            headers = {
+                "accept": "application/json",
+                "content-type": "application/json",
+                "user-agent": "okhttp/4.9.2"
+            }
+            response = requests.post("https://api.crownone.app/api/v1/Registration/verifysms",
+                                     json=payload, headers=headers)
+            users[phone]['coins'] -= 1
+            sms_logs.append({'user': phone, 'to': to, 'message': message, 'time': datetime.now()})
+            flash("Message sent successfully.")
+    return render_template('dashboard.html', coins=user_data.get('coins', 0))
 
 @app.route('/logout')
 def logout():
-    session.clear()
+    session.pop('user', None)
     return redirect('/login')
 
-# ---------------- Admin Area ----------------
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
-        if request.form['username'] == "PAKCYBER" and request.form['password'] == "24113576":
-            session['admin'] = True
+        username = request.form['username']
+        password = request.form['password']
+        if username == ADMIN_USER and password == ADMIN_PASS:
+            session['admin'] = username
             return redirect('/admin_panel')
-        flash("Invalid admin credentials")
-    return render_template("admin_login.html")
+        else:
+            flash("Invalid admin credentials")
+    return render_template('admin_login.html')
 
 @app.route('/admin_panel', methods=['GET', 'POST'])
 def admin_panel():
     if 'admin' not in session:
         return redirect('/admin_login')
-
     if request.method == 'POST':
-        phone = request.form.get('phone')
-        coins = int(request.form.get('coins', 0))
-        action = request.form.get('action')
-
-        if phone in users:
-            if action == 'block':
-                users[phone]['blocked'] = True
-            elif action == 'unblock':
-                users[phone]['blocked'] = False
-            elif action == 'add_coins':
+        action = request.form['action']
+        phone = request.form['phone']
+        if action == "add":
+            coins = int(request.form['coins'])
+            if phone in users:
                 users[phone]['coins'] += coins
-        else:
-            flash("User not found")
+        elif action == "block":
+            if phone not in blocked_users:
+                blocked_users.append(phone)
+        elif action == "unblock":
+            if phone in blocked_users:
+                blocked_users.remove(phone)
+    return render_template('admin_panel.html', users=users, logs=sms_logs, blocked=blocked_users)
 
-    return render_template('admin_panel.html', users=users, messages=messages)
-
-# -------------------------------------------
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
