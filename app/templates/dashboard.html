@@ -1,73 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>User Dashboard</title>
+  <meta charset="UTF-8" />
+  <title>Dashboard - SMS App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
-      animation: colorChange 12s infinite alternate;
+      background: linear-gradient(270deg, #00c9ff, #92fe9d, #f5576c, #4a00e0);
+      background-size: 800% 800%;
+      animation: gradientBG 12s ease infinite;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
 
-    @keyframes colorChange {
-      0% { background-color: #ff6f91; }
-      25% { background-color: #ff9671; }
-      50% { background-color: #ffc75f; }
-      75% { background-color: #f9f871; }
-      100% { background-color: #ff6f91; }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    .container {
+    .dashboard-box {
       background: white;
-      padding: 2rem;
-      margin: auto;
-      margin-top: 4vh;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+      padding: 30px;
       width: 90%;
-      max-width: 500px;
-      border-radius: 1rem;
-      text-align: center;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      max-width: 450px;
+      animation: fadeSlide 0.8s ease;
     }
 
-    input, button {
-      width: 90%;
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .balance {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+      color: #4a00e0;
+    }
+
+    input, textarea {
+      width: 100%;
       padding: 12px;
       margin: 10px 0;
-      border-radius: 8px;
+      border-radius: 12px;
       border: none;
-      font-size: 1rem;
+      background: #f0f0f0;
+      font-size: 16px;
+    }
+
+    textarea {
+      resize: none;
     }
 
     button {
-      background-color: #ff6f91;
+      width: 100%;
+      padding: 12px;
+      background: #4a00e0;
       color: white;
       font-weight: bold;
+      font-size: 16px;
+      border-radius: 10px;
+      border: none;
       cursor: pointer;
+      transition: 0.3s ease;
     }
 
-    .info {
-      background: #f1f1f1;
-      margin-bottom: 15px;
-      padding: 10px;
-      border-radius: 8px;
+    button:hover {
+      background: #3a00c0;
+    }
+
+    .flash {
+      margin-top: 10px;
+      font-weight: bold;
+      color: green;
+      text-align: center;
+    }
+
+    .logout {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .logout a {
+      color: #f5576c;
+      text-decoration: none;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Welcome, {{ phone }}</h2>
-    <div class="info">
-      <strong>Coins:</strong> {{ coins }}
-    </div>
+  <div class="dashboard-box">
+    <h2>Welcome to Dashboard</h2>
+    <div class="balance">Coins: {{ coins }}</div>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
     <form method="POST" action="/send_sms">
-      <input type="text" name="number" placeholder="Recipient Number" required>
-      <input type="text" name="message" placeholder="Your Message" required>
+      <input type="text" name="target_number" placeholder="Target Phone Number" required />
+      <textarea name="message" rows="4" placeholder="Enter your message here" required></textarea>
       <button type="submit">Send SMS</button>
     </form>
+    <div class="logout">
+      <a href="/logout">Logout</a>
+    </div>
   </div>
-
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
