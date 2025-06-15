@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: sms-web-app
+    runtime: python
+    buildCommand: ""
+    startCommand: python app/app.py
+    envVars:
+      - key: FLASK_ENV
+        value: production
