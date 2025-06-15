@@ -1,71 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Register - SMS App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      animation: colorChange 10s infinite alternate;
+      background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ADEDE, #3f51b5);
+      background-size: 800% 800%;
+      animation: gradientShift 10s ease infinite;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
-    @keyframes colorChange {
-      0% { background-color: #1e3c72; }
-      25% { background-color: #2a5298; }
-      50% { background-color: #4a00e0; }
-      75% { background-color: #8e2de2; }
-      100% { background-color: #1e3c72; }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .container {
-      background: white;
-      padding: 2rem;
-      margin: auto;
-      margin-top: 8vh;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      padding: 40px;
       width: 90%;
       max-width: 400px;
-      border-radius: 1rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
       text-align: center;
+      animation: fadeIn 1.5s ease;
     }
 
-    input, button {
-      width: 90%;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
       padding: 12px;
       margin: 10px 0;
-      border-radius: 8px;
       border: none;
-      font-size: 1rem;
+      border-radius: 10px;
+      background-color: #f0f0f0;
+      font-size: 16px;
     }
 
     button {
-      background-color: #1e3c72;
+      width: 100%;
+      padding: 12px;
+      background: #3f51b5;
+      border: none;
       color: white;
       font-weight: bold;
+      font-size: 16px;
+      border-radius: 10px;
       cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #303f9f;
+    }
+
+    .flash {
+      margin: 10px 0;
+      color: red;
+      font-weight: bold;
     }
 
     a {
-      font-size: 0.9rem;
-      color: #4a00e0;
+      color: #3f51b5;
       text-decoration: none;
+      font-size: 14px;
+    }
+
+    a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Register</h2>
-    <form method="POST" action="/register">
+    <h2>Create Account</h2>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+    <form action="/register" method="POST">
       <input type="text" name="phone" placeholder="Phone Number" required>
       <input type="password" name="password" placeholder="Password" required>
-      <input type="password" name="confirm_password" placeholder="Confirm Password" required>
       <button type="submit">Register</button>
     </form>
-    <p>Already have an account? <a href="/login">Login here</a></p>
+    <p>Already registered? <a href="/login">Login</a></p>
   </div>
-
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
-</html>
+  </html>
