@@ -3,125 +3,72 @@
 <head>
   <meta charset="UTF-8" />
   <title>Dashboard - SMS App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(-45deg, #43cea2, #185a9d, #f857a6, #ff5858);
-      background-size: 400% 400%;
-      animation: gradientFlow 8s ease infinite;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      padding: 20px;
-      color: white;
+      height: 100vh;
+      background: linear-gradient(270deg, #1e3c72, #2a5298, #1e3c72);
+      background-size: 600% 600%;
+      animation: gradient 5s ease infinite;
     }
 
-    @keyframes gradientFlow {
+    @keyframes gradient {
       0% {background-position: 0% 50%;}
       50% {background-position: 100% 50%;}
       100% {background-position: 0% 50%;}
     }
 
-    .dashboard-container {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(12px);
-      padding: 20px;
-      border-radius: 16px;
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
       width: 90%;
       max-width: 400px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    }
-
-    h2 {
       text-align: center;
-      margin-bottom: 10px;
-      color: #fff;
     }
 
-    .balance {
-      font-weight: bold;
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 18px;
-      color: #fff;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-    }
-
-    input, textarea {
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 10px;
+    input, textarea, button {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
       border: none;
+      border-radius: 10px;
       font-size: 16px;
     }
 
-    textarea {
-      resize: vertical;
-    }
-
     button {
-      background: linear-gradient(to right, #36d1dc, #5b86e5);
+      background-color: #2a5298;
       color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
       cursor: pointer;
       font-weight: bold;
-      margin-top: 10px;
-      transition: transform 0.3s;
-    }
-
-    button:hover {
-      transform: scale(1.05);
     }
 
     .flash {
-      background-color: rgba(0,0,0,0.4);
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      text-align: center;
-    }
-
-    .logout {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    .logout a {
-      color: #fff;
-      text-decoration: underline;
-      font-size: 14px;
+      color: red;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="dashboard-container">
-    <h2>Welcome, {{ session.get('user') }}</h2>
-    <div class="balance">Coins Left: {{ coins }}</div>
-
+  <div class="container">
+    <h2>Send SMS</h2>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <div class="flash">{{ messages[0] }}</div>
       {% endif %}
     {% endwith %}
-
-    <form method="POST" action="/send_sms">
-      <input type="text" name="target" placeholder="Target Phone Number" required />
-      <textarea name="message" rows="4" placeholder="Type your message here..." required></textarea>
+    <form method="POST" action="/dashboard">
+      <input type="text" name="to" placeholder="Send To (03xxxxxxxxx)" required>
+      <textarea name="message" placeholder="Enter your message" required></textarea>
       <button type="submit">Send SMS</button>
     </form>
-
-    <div class="logout">
-      <a href="/logout">Logout</a>
-    </div>
+    <p><a href="/logout">Logout</a></p>
   </div>
 </body>
-  </html>
+</html>
