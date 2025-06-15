@@ -1,89 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Register</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <meta charset="UTF-8">
+  <title>Register - SMS App</title>
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(270deg, #00c6ff, #0072ff, #00c6ff);
-      background-size: 600% 600%;
-      animation: gradient 8s ease infinite;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      animation: colorChange 10s infinite alternate;
     }
 
-    @keyframes gradient {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
+    @keyframes colorChange {
+      0% { background-color: #1e3c72; }
+      25% { background-color: #2a5298; }
+      50% { background-color: #4a00e0; }
+      75% { background-color: #8e2de2; }
+      100% { background-color: #1e3c72; }
     }
 
     .container {
-      background: #fff;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      max-width: 350px;
-      width: 100%;
+      background: white;
+      padding: 2rem;
+      margin: auto;
+      margin-top: 8vh;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 1rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
       text-align: center;
     }
 
-    h2 {
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    input {
-      width: 100%;
+    input, button {
+      width: 90%;
       padding: 12px;
       margin: 10px 0;
-      border: 2px solid #ddd;
-      border-radius: 10px;
-      outline: none;
-      transition: 0.3s;
-    }
-
-    input:focus {
-      border-color: #0072ff;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
     }
 
     button {
-      background: #0072ff;
-      color: #fff;
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      width: 100%;
-      font-size: 16px;
+      background-color: #1e3c72;
+      color: white;
+      font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
 
-    button:hover {
-      background: #005fcc;
-    }
-
-    .link {
-      margin-top: 15px;
-      font-size: 14px;
-    }
-
-    .link a {
-      color: #0072ff;
+    a {
+      font-size: 0.9rem;
+      color: #4a00e0;
       text-decoration: none;
-      font-weight: 600;
-    }
-
-    .message {
-      margin-top: 10px;
-      font-size: 14px;
-      color: red;
     }
   </style>
 </head>
@@ -91,16 +58,14 @@
   <div class="container">
     <h2>Register</h2>
     <form method="POST" action="/register">
-      <input type="text" name="phone" placeholder="Phone Number" required />
-      <input type="password" name="password" placeholder="Password" required />
+      <input type="text" name="phone" placeholder="Phone Number" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <input type="password" name="confirm_password" placeholder="Confirm Password" required>
       <button type="submit">Register</button>
     </form>
-    {% if message %}
-      <div class="message">{{ message }}</div>
-    {% endif %}
-    <div class="link">
-      Already have an account? <a href="/login">Login</a>
-    </div>
+    <p>Already have an account? <a href="/login">Login here</a></p>
   </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
