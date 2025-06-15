@@ -1,118 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <meta charset="UTF-8">
+  <title>User Dashboard</title>
   <style>
     body {
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(270deg, #22d3ee, #4ade80, #818cf8, #f472b6);
-      background-size: 600% 600%;
-      animation: gradient 10s ease infinite;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      padding: 0;
+      animation: colorChange 12s infinite alternate;
     }
 
-    @keyframes gradient {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
+    @keyframes colorChange {
+      0% { background-color: #ff6f91; }
+      25% { background-color: #ff9671; }
+      50% { background-color: #ffc75f; }
+      75% { background-color: #f9f871; }
+      100% { background-color: #ff6f91; }
     }
 
-    .dashboard {
+    .container {
       background: white;
-      padding: 25px;
-      border-radius: 20px;
-      max-width: 400px;
-      width: 100%;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      margin-top: 60px;
-    }
-
-    h2 {
-      color: #333;
+      padding: 2rem;
+      margin: auto;
+      margin-top: 4vh;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 1rem;
       text-align: center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
     }
 
-    .balance {
-      font-size: 18px;
-      font-weight: bold;
-      color: #4f46e5;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-    }
-
-    input, textarea {
-      padding: 10px;
-      margin-bottom: 12px;
-      border: 1.5px solid #ddd;
-      border-radius: 10px;
-      outline: none;
-    }
-
-    textarea {
-      resize: vertical;
+    input, button {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
     }
 
     button {
-      background-color: #4f46e5;
+      background-color: #ff6f91;
       color: white;
-      padding: 12px;
       font-weight: bold;
-      border: none;
-      border-radius: 10px;
       cursor: pointer;
-      transition: background 0.3s;
     }
 
-    button:hover {
-      background-color: #4338ca;
-    }
-
-    .logout {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    .logout a {
-      color: #ef4444;
-      font-weight: 600;
-      text-decoration: none;
-    }
-
-    .message {
-      color: green;
-      margin-top: 10px;
-      text-align: center;
+    .info {
+      background: #f1f1f1;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
-  <div class="dashboard">
-    <h2>Send SMS</h2>
-    <div class="balance">Your Coins: {{ user.coins }}</div>
+  <div class="container">
+    <h2>Welcome, {{ phone }}</h2>
+    <div class="info">
+      <strong>Coins:</strong> {{ coins }}
+    </div>
     <form method="POST" action="/send_sms">
-      <input type="text" name="mobile" placeholder="Mobile Number" required />
-      <textarea name="message" rows="4" placeholder="Your message" required></textarea>
+      <input type="text" name="number" placeholder="Recipient Number" required>
+      <input type="text" name="message" placeholder="Your Message" required>
       <button type="submit">Send SMS</button>
     </form>
-    {% if message %}
-      <div class="message">{{ message }}</div>
-    {% endif %}
-    <div class="logout">
-      <a href="/logout">Logout</a>
-    </div>
   </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
