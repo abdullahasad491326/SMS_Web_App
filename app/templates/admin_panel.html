@@ -3,139 +3,157 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
-      animation: colorChange 15s infinite alternate;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1, #fbc2eb);
+      background-size: 1000% 1000%;
+      animation: animatedGradient 15s ease infinite;
+      color: #333;
     }
 
-    @keyframes colorChange {
-      0% { background-color: #fc466b; }
-      50% { background-color: #3f5efb; }
-      100% { background-color: #fc466b; }
+    @keyframes animatedGradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .container {
-      background: white;
-      padding: 2rem;
-      margin: 5vh auto;
-      width: 95%;
-      max-width: 800px;
-      border-radius: 1rem;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      padding: 20px;
     }
 
-    h2 {
+    h1 {
       text-align: center;
-      color: #3f5efb;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .section {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+
+    .section h2 {
+      color: #4a00e0;
+      margin-bottom: 10px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1rem;
+      margin-top: 10px;
     }
 
     th, td {
-      border: 1px solid #ddd;
       padding: 10px;
-      text-align: center;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
     }
 
     th {
-      background-color: #3f5efb;
-      color: white;
+      background: #f0f0f0;
     }
 
-    .form-section {
-      margin-top: 2rem;
+    .form-inline {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
-    input, button {
+    input[type="text"], input[type="number"] {
       padding: 10px;
-      margin: 5px 0;
-      width: 100%;
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid #ccc;
     }
 
     button {
-      background-color: #3f5efb;
-      color: white;
+      padding: 10px;
+      background: #4a00e0;
+      color: #fff;
       font-weight: bold;
+      border: none;
+      border-radius: 10px;
       cursor: pointer;
     }
 
-    .blocked {
-      color: red;
+    button:hover {
+      background: #3a00b0;
     }
 
-    .unblocked {
-      color: green;
+    @media (max-width: 768px) {
+      th, td {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Admin Panel</h2>
+    <h1>Admin Panel</h1>
 
-    <div class="form-section">
-      <form method="POST" action="/admin_add_coins">
-        <input type="text" name="phone" placeholder="User Phone Number" required>
+    <div class="section">
+      <h2>All Users</h2>
+      <table>
+        <tr>
+          <th>Phone</th>
+          <th>Password</th>
+          <th>Coins</th>
+          <th>Remaining</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+          <td>{{ user[0] }}</td>
+          <td>{{ user[1] }}</td>
+          <td>{{ user[2] }}</td>
+          <td>{{ user[3] }}</td>
+          <td>{{ 'Blocked' if user[4] == 1 else 'Active' }}</td>
+          <td>
+            <form method="POST" action="/block_unblock" style="display:inline;">
+              <input type="hidden" name="phone" value="{{ user[0] }}">
+              <button type="submit">{{ 'Unblock' if user[4] == 1 else 'Block' }}</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>Add Coins to User</h2>
+      <form method="POST" action="/add_coins" class="form-inline">
+        <input type="text" name="phone" placeholder="Phone Number" required>
         <input type="number" name="coins" placeholder="Coins to Add" required>
         <button type="submit">Add Coins</button>
       </form>
     </div>
 
-    <h3>Users</h3>
-    <table>
-      <tr>
-        <th>Phone</th>
-        <th>Password</th>
-        <th>Coins</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-      {% for user in users %}
-      <tr>
-        <td>{{ user.phone }}</td>
-        <td>{{ user.password }}</td>
-        <td>{{ user.coins }}</td>
-        <td class="{{ 'blocked' if user.blocked else 'unblocked' }}">
-          {{ 'Blocked' if user.blocked else 'Active' }}
-        </td>
-        <td>
-          {% if user.blocked %}
-            <a href="/admin_unblock/{{ user.phone }}">Unblock</a>
-          {% else %}
-            <a href="/admin_block/{{ user.phone }}">Block</a>
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-
-    <h3>SMS History</h3>
-    <table>
-      <tr>
-        <th>User</th>
-        <th>To Number</th>
-        <th>Message</th>
-        <th>Time</th>
-      </tr>
-      {% for sms in sms_logs %}
-      <tr>
-        <td>{{ sms.phone }}</td>
-        <td>{{ sms.target }}</td>
-        <td>{{ sms.message }}</td>
-        <td>{{ sms.time }}</td>
-      </tr>
-      {% endfor %}
-    </table>
+    <div class="section">
+      <h2>Message History</h2>
+      <table>
+        <tr>
+          <th>User</th>
+          <th>To Number</th>
+          <th>Message</th>
+          <th>Time</th>
+        </tr>
+        {% for log in messages %}
+        <tr>
+          <td>{{ log[0] }}</td>
+          <td>{{ log[1] }}</td>
+          <td>{{ log[2] }}</td>
+          <td>{{ log[3] }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
   </div>
-
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
