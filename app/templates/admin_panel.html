@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(270deg, #facc15, #f472b6, #60a5fa, #4ade80);
+      background-size: 800% 800%;
+      animation: gradient 10s ease infinite;
+      padding: 20px;
+    }
+
+    @keyframes gradient {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    .panel {
+      background-color: white;
+      border-radius: 20px;
+      padding: 25px;
+      max-width: 1000px;
+      margin: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+      text-align: center;
+      color: #1f2937;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid #e5e7eb;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #f3f4f6;
+    }
+
+    .form {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    input, button {
+      padding: 10px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 10px;
+    }
+
+    button {
+      background-color: #10b981;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #059669;
+    }
+
+    .logout {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .logout a {
+      color: #ef4444;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+      table {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h2>Admin Panel</h2>
+
+    <form class="form" method="POST" action="/add_coins">
+      <input type="text" name="phone" placeholder="User Phone" required>
+      <input type="number" name="coins" placeholder="Coins to Add" required>
+      <button type="submit">Add Coins</button>
+    </form>
+
+    <table>
+      <tr>
+        <th>Phone</th>
+        <th>Password</th>
+        <th>Coins</th>
+        <th>Blocked?</th>
+        <th>SMS Logs</th>
+        <th>Actions</th>
+      </tr>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.phone }}</td>
+        <td>{{ user.password }}</td>
+        <td>{{ user.coins }}</td>
+        <td>{{ 'Yes' if user.blocked else 'No' }}</td>
+        <td>
+          {% for log in user.logs %}
+            📩 {{ log.number }}<br>🕒 {{ log.time }}<br><br>
+          {% endfor %}
+        </td>
+        <td>
+          <form method="POST" action="/toggle_block" style="margin:0;">
+            <input type="hidden" name="phone" value="{{ user.phone }}">
+            <button type="submit">{{ 'Unblock' if user.blocked else 'Block' }}</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <div class="logout">
+      <a href="/admin_logout">Logout</a>
+    </div>
+  </div>
+</body>
+  </html>
