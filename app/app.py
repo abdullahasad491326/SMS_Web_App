@@ -1,144 +1,163 @@
-from flask import Flask, render_template, request, redirect, session, url_for, flash
+from flask import Flask, render_template, request, redirect, session, flash, url_for
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-import requests
-import sqlite3
+from datetime import datetime
+import json
 import os
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = 'your_super_secret_key'
 
-limiter = Limiter(get_remote_address, app=app)
+limiter = Limiter(app, key_func=get_remote_address)
 
-# Ensure DB exists
-if not os.path.exists("users.db"):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    c.execute('''CREATE TABLE users (phone TEXT PRIMARY KEY, password TEXT, coins INTEGER DEFAULT 10, blocked INTEGER DEFAULT 0)''')
-    c.execute('''CREATE TABLE messages (phone TEXT, target TEXT, message TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)''')
-    conn.commit()
-    conn.close()
+# File-based "database"
+DATA_FILE = 'users.json'
+ADMIN_USERNAME = 'admin'
+ADMIN_PASSWORD = '2113576AABBCCDD'
+
+# Load users
+def load_users():
+    if not os.path.exists(DATA_FILE):
+        return {}
+    with open(DATA_FILE, 'r') as f:
+        return json.load(f)
+
+# Save users
+def save_users(users):
+    with open(DATA_FILE, 'w') as f:
+        json.dump(users, f, indent=4)
 
 @app.route('/')
 def home():
-    return redirect(url_for('login'))
+    return redirect('/login')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    users = load_users()
     if request.method == 'POST':
         phone = request.form['phone']
         password = request.form['password']
         confirm = request.form['confirm_password']
+
+        if phone in users:
+            return render_template('register.html', message='User already registered.')
         if password != confirm:
-            flash("Passwords do not match")
-            return render_template('register.html')
-        conn = sqlite3.connect("users.db")
-        c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE phone = ?", (phone,))
-        if c.fetchone():
-            flash("User already registered")
-            return render_template('register.html')
-        c.execute("INSERT INTO users (phone, password) VALUES (?, ?)", (phone, password))
-        conn.commit()
-        conn.close()
-        flash("Successfully registered! Please login.")
-        return redirect(url_for('login'))
+            return render_template('register.html', message='Passwords do not match.')
+
+        users[phone] = {
+            'password': password,
+            'coins': 0,
+            'blocked': False,
+            'logs': []
+        }
+        save_users(users)
+        flash("Registration successful! You can now login.")
+        return redirect('/login')
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    users = load_users()
     if request.method == 'POST':
         phone = request.form['phone']
         password = request.form['password']
-        conn = sqlite3.connect("users.db")
-        c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE phone = ? AND password = ?", (phone, password))
-        user = c.fetchone()
-        conn.close()
-        if user:
+        if phone in users and users[phone]['password'] == password:
+            if users[phone].get('blocked'):
+                return render_template('login.html', message='You are blocked.')
             session['user'] = phone
-            return redirect(url_for('dashboard'))
+            return redirect('/dashboard')
         else:
-            flash("Invalid credentials")
+            return render_template('login.html', message='Invalid credentials.')
     return render_template('login.html')
 
 @app.route('/dashboard', methods=['GET', 'POST'])
-@limiter.limit("3 per minute")
+@limiter.limit("5 per minute")
 def dashboard():
     if 'user' not in session:
-        return redirect(url_for('login'))
+        return redirect('/login')
+    users = load_users()
     phone = session['user']
     if request.method == 'POST':
-        target = request.form['target']
+        number = request.form['number']
         message = request.form['message']
-        conn = sqlite3.connect("users.db")
-        c = conn.cursor()
-        c.execute("SELECT coins, blocked FROM users WHERE phone = ?", (phone,))
-        result = c.fetchone()
-        if result and result[1] == 1:
-            flash("You are blocked from sending messages.")
-            return redirect(url_for('dashboard'))
-        if result and result[0] > 0:
-            payload = {
-                "Code": "1234",
-                "Mobile": target,
+        if users[phone]['coins'] <= 0:
+            return render_template('dashboard.html', phone=phone, coins=users[phone]['coins'], message="Not enough coins.")
+        
+        # Simulated API request (you can replace with real API)
+        import requests
+        try:
+            res = requests.post("https://api.crownone.app/api/v1/Registration/verifysms", json={
+                "Code": 1234,
+                "Mobile": number,
                 "Message": message
-            }
-            headers = {
-                "Host": "api.crownone.app",
-                "accept": "application/json",
-                "content-type": "application/json",
-                "accept-encoding": "gzip",
-                "user-agent": "okhttp/4.9.2"
-            }
-            response = requests.post("https://api.crownone.app/api/v1/Registration/verifysms",
-                                     json=payload, headers=headers)
-            if response.status_code == 200:
-                c.execute("INSERT INTO messages (phone, target, message) VALUES (?, ?, ?)", (phone, target, message))
-                c.execute("UPDATE users SET coins = coins - 1 WHERE phone = ?", (phone,))
-                conn.commit()
-                flash("Message sent successfully!")
+            })
+            if res.status_code == 200:
+                users[phone]['coins'] -= 1
+                users[phone]['logs'].append({
+                    'number': number,
+                    'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                })
+                save_users(users)
+                return render_template('dashboard.html', phone=phone, coins=users[phone]['coins'], message="SMS sent successfully!")
             else:
-                flash("Failed to send message.")
-        else:
-            flash("Insufficient coins.")
-        conn.close()
-    return render_template('dashboard.html')
+                return render_template('dashboard.html', phone=phone, coins=users[phone]['coins'], message="Failed to send SMS.")
+        except:
+            return render_template('dashboard.html', phone=phone, coins=users[phone]['coins'], message="API error.")
+    return render_template('dashboard.html', phone=phone, coins=users[phone]['coins'])
 
 @app.route('/logout')
 def logout():
     session.pop('user', None)
-    return redirect(url_for('login'))
+    return redirect('/login')
 
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == "admin" and password == "admin123":
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             session['admin'] = True
-            return redirect(url_for('admin_panel'))
+            return redirect('/admin_panel')
         else:
-            flash("Invalid admin credentials")
+            return render_template('admin_login.html', message='Invalid admin credentials.')
     return render_template('admin_login.html')
 
-@app.route('/admin_panel', methods=['GET', 'POST'])
+@app.route('/admin_panel')
 def admin_panel():
-    if 'admin' not in session:
-        return redirect(url_for('admin_login'))
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    if request.method == 'POST':
-        number = request.form['number']
-        coins = int(request.form['coins'])
-        c.execute("UPDATE users SET coins = coins + ? WHERE phone = ?", (coins, number))
-        conn.commit()
-    c.execute("SELECT * FROM users")
-    users = c.fetchall()
-    c.execute("SELECT * FROM messages ORDER BY timestamp DESC")
-    messages = c.fetchall()
-    conn.close()
-    return render_template('admin_panel.html', users=users, messages=messages)
+    if not session.get('admin'):
+        return redirect('/admin_login')
+    users = load_users()
+    return render_template('admin_panel.html', users=[
+        {'phone': k, **v} for k, v in users.items()
+    ])
+
+@app.route('/add_coins', methods=['POST'])
+def add_coins():
+    if not session.get('admin'):
+        return redirect('/admin_login')
+    phone = request.form['phone']
+    coins = int(request.form['coins'])
+    users = load_users()
+    if phone in users:
+        users[phone]['coins'] += coins
+        save_users(users)
+    return redirect('/admin_panel')
+
+@app.route('/toggle_block', methods=['POST'])
+def toggle_block():
+    if not session.get('admin'):
+        return redirect('/admin_login')
+    phone = request.form['phone']
+    users = load_users()
+    if phone in users:
+        users[phone]['blocked'] = not users[phone].get('blocked', False)
+        save_users(users)
+    return redirect('/admin_panel')
+
+@app.route('/admin_logout')
+def admin_logout():
+    session.pop('admin', None)
+    return redirect('/admin_login')
 
 if __name__ == '__main__':
     app.run(debug=True)
