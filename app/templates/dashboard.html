@@ -8,118 +8,120 @@
   <style>
     body {
       margin: 0;
-      padding: 0;
-      background: linear-gradient(270deg, #00c9ff, #92fe9d, #f5576c, #4a00e0);
-      background-size: 800% 800%;
-      animation: gradientBG 12s ease infinite;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(-45deg, #43cea2, #185a9d, #f857a6, #ff5858);
+      background-size: 400% 400%;
+      animation: gradientFlow 8s ease infinite;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      min-height: 100vh;
+      padding: 20px;
+      color: white;
     }
 
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    @keyframes gradientFlow {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
     }
 
-    .dashboard-box {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
-      padding: 30px;
+    .dashboard-container {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(12px);
+      padding: 20px;
+      border-radius: 16px;
       width: 90%;
-      max-width: 450px;
-      animation: fadeSlide 0.8s ease;
-    }
-
-    @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+      max-width: 400px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
 
     h2 {
-      color: #333;
-      margin-bottom: 10px;
       text-align: center;
+      margin-bottom: 10px;
+      color: #fff;
     }
 
     .balance {
-      text-align: center;
-      margin-bottom: 20px;
       font-weight: bold;
-      color: #4a00e0;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 18px;
+      color: #fff;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
     }
 
     input, textarea {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 12px;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 10px;
       border: none;
-      background: #f0f0f0;
       font-size: 16px;
     }
 
     textarea {
-      resize: none;
+      resize: vertical;
     }
 
     button {
-      width: 100%;
-      padding: 12px;
-      background: #4a00e0;
+      background: linear-gradient(to right, #36d1dc, #5b86e5);
       color: white;
-      font-weight: bold;
-      font-size: 16px;
-      border-radius: 10px;
+      padding: 12px;
       border: none;
+      border-radius: 10px;
       cursor: pointer;
-      transition: 0.3s ease;
+      font-weight: bold;
+      margin-top: 10px;
+      transition: transform 0.3s;
     }
 
     button:hover {
-      background: #3a00c0;
+      transform: scale(1.05);
     }
 
     .flash {
-      margin-top: 10px;
-      font-weight: bold;
-      color: green;
+      background-color: rgba(0,0,0,0.4);
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 15px;
       text-align: center;
     }
 
     .logout {
+      margin-top: 20px;
       text-align: center;
-      margin-top: 15px;
     }
 
     .logout a {
-      color: #f5576c;
-      text-decoration: none;
-      font-weight: bold;
+      color: #fff;
+      text-decoration: underline;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <div class="dashboard-box">
-    <h2>Welcome to Dashboard</h2>
-    <div class="balance">Coins: {{ coins }}</div>
+  <div class="dashboard-container">
+    <h2>Welcome, {{ session.get('user') }}</h2>
+    <div class="balance">Coins Left: {{ coins }}</div>
+
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <div class="flash">{{ messages[0] }}</div>
       {% endif %}
     {% endwith %}
+
     <form method="POST" action="/send_sms">
-      <input type="text" name="target_number" placeholder="Target Phone Number" required />
-      <textarea name="message" rows="4" placeholder="Enter your message here" required></textarea>
+      <input type="text" name="target" placeholder="Target Phone Number" required />
+      <textarea name="message" rows="4" placeholder="Type your message here..." required></textarea>
       <button type="submit">Send SMS</button>
     </form>
+
     <div class="logout">
       <a href="/logout">Logout</a>
     </div>
   </div>
 </body>
-</html>
+  </html>
