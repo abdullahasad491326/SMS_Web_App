@@ -1,120 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Admin Panel</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
     body {
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(270deg, #facc15, #f472b6, #60a5fa, #4ade80);
-      background-size: 800% 800%;
-      animation: gradient 10s ease infinite;
-      padding: 20px;
+      padding: 0;
+      animation: colorChange 15s infinite alternate;
     }
 
-    @keyframes gradient {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
+    @keyframes colorChange {
+      0% { background-color: #fc466b; }
+      50% { background-color: #3f5efb; }
+      100% { background-color: #fc466b; }
     }
 
-    .panel {
-      background-color: white;
-      border-radius: 20px;
-      padding: 25px;
-      max-width: 1000px;
-      margin: auto;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    .container {
+      background: white;
+      padding: 2rem;
+      margin: 5vh auto;
+      width: 95%;
+      max-width: 800px;
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
     }
 
     h2 {
       text-align: center;
-      color: #1f2937;
+      color: #3f5efb;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    table, th, td {
-      border: 1px solid #e5e7eb;
+      margin-top: 1rem;
     }
 
     th, td {
+      border: 1px solid #ddd;
       padding: 10px;
       text-align: center;
-      font-size: 14px;
     }
 
     th {
-      background-color: #f3f4f6;
+      background-color: #3f5efb;
+      color: white;
     }
 
-    .form {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
+    .form-section {
+      margin-top: 2rem;
     }
 
     input, button {
       padding: 10px;
-      border: 1.5px solid #d1d5db;
-      border-radius: 10px;
+      margin: 5px 0;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
 
     button {
-      background-color: #10b981;
+      background-color: #3f5efb;
       color: white;
-      font-weight: 600;
+      font-weight: bold;
       cursor: pointer;
     }
 
-    button:hover {
-      background-color: #059669;
+    .blocked {
+      color: red;
     }
 
-    .logout {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .logout a {
-      color: #ef4444;
-      font-weight: bold;
-      text-decoration: none;
-    }
-
-    @media (max-width: 600px) {
-      table {
-        font-size: 12px;
-      }
+    .unblocked {
+      color: green;
     }
   </style>
 </head>
 <body>
-  <div class="panel">
+  <div class="container">
     <h2>Admin Panel</h2>
 
-    <form class="form" method="POST" action="/add_coins">
-      <input type="text" name="phone" placeholder="User Phone" required>
-      <input type="number" name="coins" placeholder="Coins to Add" required>
-      <button type="submit">Add Coins</button>
-    </form>
+    <div class="form-section">
+      <form method="POST" action="/admin_add_coins">
+        <input type="text" name="phone" placeholder="User Phone Number" required>
+        <input type="number" name="coins" placeholder="Coins to Add" required>
+        <button type="submit">Add Coins</button>
+      </form>
+    </div>
 
+    <h3>Users</h3>
     <table>
       <tr>
         <th>Phone</th>
         <th>Password</th>
         <th>Coins</th>
-        <th>Blocked?</th>
-        <th>SMS Logs</th>
+        <th>Status</th>
         <th>Actions</th>
       </tr>
       {% for user in users %}
@@ -122,25 +103,39 @@
         <td>{{ user.phone }}</td>
         <td>{{ user.password }}</td>
         <td>{{ user.coins }}</td>
-        <td>{{ 'Yes' if user.blocked else 'No' }}</td>
-        <td>
-          {% for log in user.logs %}
-            📩 {{ log.number }}<br>🕒 {{ log.time }}<br><br>
-          {% endfor %}
+        <td class="{{ 'blocked' if user.blocked else 'unblocked' }}">
+          {{ 'Blocked' if user.blocked else 'Active' }}
         </td>
         <td>
-          <form method="POST" action="/toggle_block" style="margin:0;">
-            <input type="hidden" name="phone" value="{{ user.phone }}">
-            <button type="submit">{{ 'Unblock' if user.blocked else 'Block' }}</button>
-          </form>
+          {% if user.blocked %}
+            <a href="/admin_unblock/{{ user.phone }}">Unblock</a>
+          {% else %}
+            <a href="/admin_block/{{ user.phone }}">Block</a>
+          {% endif %}
         </td>
       </tr>
       {% endfor %}
     </table>
 
-    <div class="logout">
-      <a href="/admin_logout">Logout</a>
-    </div>
+    <h3>SMS History</h3>
+    <table>
+      <tr>
+        <th>User</th>
+        <th>To Number</th>
+        <th>Message</th>
+        <th>Time</th>
+      </tr>
+      {% for sms in sms_logs %}
+      <tr>
+        <td>{{ sms.phone }}</td>
+        <td>{{ sms.target }}</td>
+        <td>{{ sms.message }}</td>
+        <td>{{ sms.time }}</td>
+      </tr>
+      {% endfor %}
+    </table>
   </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
-  </html>
+</html>
