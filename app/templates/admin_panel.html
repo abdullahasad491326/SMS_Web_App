@@ -2,47 +2,47 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Panel</title>
+  <title>Admin Panel - SMS App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="card-container">
-    <div class="glass-card">
-      <h2>📊 Admin Panel</h2>
-      <h4>Users:</h4>
-      <ul>
-        {% for phone, data in users.items() %}
-          <li>{{ phone }} - Password: {{ data.password }} - Coins: {{ data.coins }}</li>
-        {% endfor %}
-      </ul>
+  <div class="card">
+    <h2>🧑‍💼 Admin Panel</h2>
 
-      <h4>Add Coins:</h4>
-      <form method="POST">
-        <input type="hidden" name="action" value="add">
-        <input type="text" name="phone" placeholder="Phone Number" required>
-        <input type="number" name="coins" placeholder="Coins to Add" required>
-        <button type="submit">Add Coins</button>
-      </form>
+    <form method="POST">
+      <input type="text" name="phone" placeholder="📞 Target Phone" required>
+      <input type="number" name="coins" placeholder="💰 Coins to Add (for Add option)">
+      <select name="action" required>
+        <option value="add">➕ Add Coins</option>
+        <option value="block">🚫 Block User</option>
+        <option value="unblock">✅ Unblock User</option>
+      </select>
+      <button type="submit">Apply</button>
+    </form>
 
-      <h4>Block / Unblock User:</h4>
-      <form method="POST">
-        <input type="text" name="phone" placeholder="Phone Number" required>
-        <select name="action">
-          <option value="block">Block</option>
-          <option value="unblock">Unblock</option>
-        </select>
-        <button type="submit">Update</button>
-      </form>
+    <h3>📱 Users</h3>
+    <ul>
+      {% for user, data in users.items() %}
+        <li><strong>{{ user }}</strong>: {{ data['coins'] }} coins</li>
+      {% endfor %}
+    </ul>
 
-      <h4>SMS Logs:</h4>
-      <ul>
-        {% for log in logs %}
-          <li>{{ log.user }} sent to {{ log.to }} at {{ log.time }}: {{ log.message }}</li>
-        {% endfor %}
-      </ul>
-      <br><a href="/logout">Logout</a>
-    </div>
+    <h3>🚫 Blocked Users</h3>
+    <ul>
+      {% for user in blocked %}
+        <li>{{ user }}</li>
+      {% endfor %}
+    </ul>
+
+    <h3>📜 Message Logs</h3>
+    <ul>
+      {% for log in logs %}
+        <li><strong>{{ log.user }}</strong> ➡ <strong>{{ log.to }}</strong>: "{{ log.message }}" at {{ log.time }}</li>
+      {% endfor %}
+    </ul>
+
+    <p><a href="/logout">🚪 Logout</a></p>
   </div>
 </body>
 </html>
