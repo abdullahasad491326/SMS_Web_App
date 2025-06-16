@@ -1,89 +1,93 @@
-body {
+/* Reset and base styles */
+body, html {
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #3f51b5, #1e88e5, #00bcd4);
-  background-size: 400% 400%;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #3f87a6, #ebf8e1, #f69d3c);
+  background-size: 600% 600%;
   animation: gradientBG 12s ease infinite;
+}
+
+/* Card container center */
+.card-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  color: #fff;
+  padding: 20px;
 }
 
+/* Glassmorphism effect card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 30px;
+  width: 90%;
+  max-width: 400px;
+  color: #fff;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  animation: fadeInUp 0.8s ease-out;
+}
+
+/* Form inputs */
+input, textarea, select {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transition: 0.3s;
+}
+input::placeholder, textarea::placeholder {
+  color: #ddd;
+}
+
+/* Buttons */
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+button:hover {
+  background-color: #0056b3;
+}
+button.logout {
+  background-color: #dc3545;
+}
+button.logout:hover {
+  background-color: #b02a37;
+}
+
+/* Flash messages */
+.flash {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  margin: 10px 0;
+  color: #fff;
+  text-align: center;
+  border-radius: 10px;
+}
+
+/* Animations */
 @keyframes gradientBG {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-.card-container {
-  max-width: 400px;
-  width: 90%;
-  margin: auto;
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
-  padding: 30px;
-  border-radius: 25px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-  text-align: center;
-  transition: all 0.3s ease-in-out;
-}
-
-.glass-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-}
-
-input, select, textarea {
-  width: 90%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 12px;
-  border: none;
-  outline: none;
-  font-size: 16px;
-  background: rgba(255, 255, 255, 0.8);
-  color: #333;
-}
-
-textarea {
-  resize: vertical;
-  height: 100px;
-}
-
-button {
-  width: 95%;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(45deg, #00c6ff, #0072ff);
-  color: white;
-  font-weight: bold;
-  font-size: 16px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  transition: background 0.3s ease;
-}
-
-button:hover {
-  background: linear-gradient(45deg, #0072ff, #00c6ff);
-}
-
-a {
-  color: #fff;
-  text-decoration: underline;
-  font-weight: bold;
-}
-
-.flash {
-  background: #f44336;
-  color: white;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 10px;
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
