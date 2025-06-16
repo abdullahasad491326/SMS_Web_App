@@ -2,60 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Panel - SMS App</title>
+  <title>Admin Panel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <style>
-    table {
-      width: 100%;
-      margin-top: 1rem;
-      background: rgba(255, 255, 255, 0.1);
-      border-collapse: collapse;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    th, td {
-      padding: 0.75rem;
-      text-align: left;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-    }
-    th {
-      background: rgba(255, 255, 255, 0.2);
-      color: #fff;
-    }
-    td {
-      color: #fff;
-    }
-    .block-btn {
-      background: red;
-      color: white;
-    }
-    .unblock-btn {
-      background: green;
-      color: white;
-    }
-  </style>
 </head>
 <body>
-  <div class="card-container">
-    <div class="glass-card" style="width: 100%; max-width: 1200px;">
-      <h2>🛠️ Admin Panel</h2>
+  <div class="admin-panel">
+    <h2>🛠️ Admin Dashboard</h2>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+    
+    <form method="POST" class="admin-form">
+      <input type="text" name="phone" placeholder="📱 User Phone" required />
+      <input type="number" name="coins" placeholder="💰 Coins (for Add)" />
+      <div class="btn-group">
+        <button name="action" value="add">➕ Add Coins</button>
+        <button name="action" value="block">🚫 Block</button>
+        <button name="action" value="unblock">✅ Unblock</button>
+      </div>
+    </form>
 
-      {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          <div class="flash">{{ messages[0] }}</div>
-        {% endif %}
-      {% endwith %}
-
-      <form method="POST" style="margin-bottom: 1rem;">
-        <input type="text" name="phone" placeholder="User Phone Number" required>
-        <input type="number" name="coins" placeholder="Coins to Add">
-        <button type="submit" name="action" value="add">Add Coins</button>
-        <button type="submit" name="action" value="block" class="block-btn">Block</button>
-        <button type="submit" name="action" value="unblock" class="unblock-btn">Unblock</button>
-      </form>
-
-      <h3>👥 Users</h3>
+    <h3>📋 Users</h3>
+    <div class="scroll-table">
       <table>
         <tr>
           <th>Phone</th>
@@ -64,16 +35,18 @@
           <th>Status</th>
         </tr>
         {% for phone, data in users.items() %}
-          <tr>
-            <td>{{ phone }}</td>
-            <td>{{ data.password }}</td>
-            <td>{{ data.coins }}</td>
-            <td>{{ "Blocked" if phone in blocked else "Active" }}</td>
-          </tr>
+        <tr>
+          <td>{{ phone }}</td>
+          <td>{{ data.password }}</td>
+          <td>{{ data.coins }}</td>
+          <td>{% if phone in blocked %}<span style="color:red;">Blocked</span>{% else %}<span style="color:green;">Active</span>{% endif %}</td>
+        </tr>
         {% endfor %}
       </table>
+    </div>
 
-      <h3>📨 SMS Logs</h3>
+    <h3>📨 SMS Logs</h3>
+    <div class="scroll-table">
       <table>
         <tr>
           <th>User</th>
@@ -82,18 +55,18 @@
           <th>Time</th>
         </tr>
         {% for log in logs %}
-          <tr>
-            <td>{{ log.user }}</td>
-            <td>{{ log.to }}</td>
-            <td>{{ log.message }}</td>
-            <td>{{ log.time.strftime("%Y-%m-%d %H:%M:%S") }}</td>
-          </tr>
+        <tr>
+          <td>{{ log.user }}</td>
+          <td>{{ log.to }}</td>
+          <td>{{ log.message }}</td>
+          <td>{{ log.time }}</td>
+        </tr>
         {% endfor %}
       </table>
-
-      <br>
-      <a href="/logout"><button>Logout</button></a>
     </div>
+
+    <br>
+    <a href="/logout"><button class="logout-btn">🚪 Logout</button></a>
   </div>
 </body>
 </html>
