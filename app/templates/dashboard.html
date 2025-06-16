@@ -3,29 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <title>Dashboard - SMS App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="card-container">
     <div class="glass-card">
-      <h2>📨 Send SMS</h2>
-      <p>💰 Coins Left: <strong>{{ coins }}</strong></p>
-      
+      <h2>📤 Send SMS</h2>
+      <p style="margin-bottom: 10px;"><strong>Coins:</strong> {{ coins }}</p>
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <div class="flash">{{ messages[0] }}</div>
         {% endif %}
       {% endwith %}
-
       <form method="POST">
-        <input type="text" name="to" placeholder="📞 Receiver Number (e.g. 03001234567)" required />
-        <textarea name="message" rows="5" placeholder="💬 Enter your message here..." required></textarea>
-        <button type="submit">🚀 Send SMS</button>
+        <input type="text" name="to" placeholder="📱 Target Phone Number" required>
+        <textarea name="message" placeholder="✍️ Your message here..." rows="5" required></textarea>
+        <button type="submit">Send SMS</button>
       </form>
-
-      <form action="/logout" method="GET">
-        <button class="logout-btn">🚪 Logout</button>
+      <form action="/logout" method="get">
+        <button type="submit" class="logout-button">Logout</button>
       </form>
     </div>
   </div>
