@@ -7,7 +7,7 @@ import sqlite3
 from database import get_user, add_user, validate_user, log_sms, get_user_coins, update_user_coins, get_all_users, block_user, unblock_user, is_blocked, get_sms_logs
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = '44884488'
 
 limiter = Limiter(get_remote_address, app=app)
 
