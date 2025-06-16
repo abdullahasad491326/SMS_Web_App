@@ -1,111 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>👑 Admin Panel</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <style>
-    table {
-      width: 100%;
-      margin-top: 20px;
-      background-color: rgba(255, 255, 255, 0.9);
-      border-collapse: collapse;
-      border-radius: 10px;
-      overflow: hidden;
-      font-size: 14px;
-    }
-
-    table th, table td {
-      padding: 12px;
-      border: 1px solid #ddd;
-      text-align: center;
-    }
-
-    table th {
-      background-color: #4facfe;
-      color: white;
-    }
-
-    .logout {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    .logout form button {
-      background-color: red;
-      padding: 10px 20px;
-      border-radius: 10px;
-    }
-
-    .form-inline input {
-      margin-top: 10px;
-    }
-
-    h2 {
-      color: white;
-      text-align: center;
-    }
-  </style>
 </head>
 <body>
   <div class="card-container">
-    <h2>📊 Admin Dashboard</h2>
+    <div class="glass-card">
+      <h2>👑 Admin Dashboard</h2>
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="flash">{{ messages[0] }}</div>
-      {% endif %}
-    {% endwith %}
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash">{{ messages[0] }}</div>
+        {% endif %}
+      {% endwith %}
 
-    <form method="POST">
-      <input type="text" name="phone" placeholder="Enter Phone Number" required>
-      <input type="number" name="coins" placeholder="Coins to Add">
-      <button type="submit" name="action" value="add">➕ Add Coins</button>
-      <button type="submit" name="action" value="block">🚫 Block</button>
-      <button type="submit" name="action" value="unblock">✅ Unblock</button>
-    </form>
-
-    <h3 style="margin-top: 30px; color:white;">👥 Users</h3>
-    <table>
-      <tr>
-        <th>Phone</th>
-        <th>Password</th>
-        <th>Coins</th>
-        <th>Status</th>
-      </tr>
-      {% for phone, data in users.items() %}
-        <tr>
-          <td>{{ phone }}</td>
-          <td>{{ data.password }}</td>
-          <td>{{ data.coins }}</td>
-          <td>{{ 'Blocked' if phone in blocked else 'Active' }}</td>
-        </tr>
-      {% endfor %}
-    </table>
-
-    <h3 style="margin-top: 30px; color:white;">📬 SMS Logs</h3>
-    <table>
-      <tr>
-        <th>User</th>
-        <th>To</th>
-        <th>Message</th>
-        <th>Time</th>
-      </tr>
-      {% for log in logs %}
-        <tr>
-          <td>{{ log.user }}</td>
-          <td>{{ log.to }}</td>
-          <td>{{ log.message }}</td>
-          <td>{{ log.time }}</td>
-        </tr>
-      {% endfor %}
-    </table>
-
-    <div class="logout">
-      <form action="/logout" method="GET">
-        <button>Logout</button>
+      <form method="POST">
+        <input type="text" name="phone" placeholder="📱 User Phone" required>
+        <input type="number" name="coins" placeholder="➕ Coins to Add">
+        <button type="submit" name="action" value="add">💰 Add Coins</button>
+        <button type="submit" name="action" value="block">🚫 Block</button>
+        <button type="submit" name="action" value="unblock">✅ Unblock</button>
       </form>
+
+      <h3>📋 Users</h3>
+      <table>
+        <tr>
+          <th>📱 Phone</th>
+          <th>🔑 Password</th>
+          <th>💰 Coins</th>
+          <th>⛔ Blocked</th>
+        </tr>
+        {% for u in users %}
+        <tr>
+          <td>{{ u[0] }}</td>
+          <td>{{ u[1] }}</td>
+          <td>{{ u[2] }}</td>
+          <td>{{ '✅' if u[3] else '❌' }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+
+      <h3>📨 Message Logs</h3>
+      <table>
+        <tr>
+          <th>👤 User</th>
+          <th>📱 To</th>
+          <th>💬 Message</th>
+          <th>⏰ Time</th>
+        </tr>
+        {% for log in logs %}
+        <tr>
+          <td>{{ log[1] }}</td>
+          <td>{{ log[2] }}</td>
+          <td>{{ log[3] }}</td>
+          <td>{{ log[4] }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+
+      <a href="/logout" class="logout-btn">🚪 Logout</a>
     </div>
   </div>
 </body>
