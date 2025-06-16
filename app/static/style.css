@@ -1,164 +1,80 @@
 body {
-  margin: 0;
-  padding: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: linear-gradient(135deg, #4b6cb7, #182848);
-  color: #fff;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: backgroundShift 10s ease infinite alternate;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(145deg, #001f3f, #0074D9);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    text-align: center;
 }
 
-@keyframes backgroundShift {
-  0% {
-    background: linear-gradient(135deg, #4b6cb7, #182848);
-  }
-  100% {
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-  }
+.form-container {
+    max-width: 400px;
+    background: #f0f0f0;
+    margin: 60px auto;
+    padding: 30px;
+    border-radius: 20px;
+    color: #333;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 }
 
-.card-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  width: 100%;
+h2 {
+    margin-bottom: 20px;
 }
 
-.card-container.wide {
-  max-width: 1000px;
-  margin: auto;
-  flex-direction: column;
+input[type="text"],
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    box-sizing: border-box;
 }
 
-.glass-card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  width: 100%;
-  max-width: 400px;
-  color: #fff;
-  text-align: center;
-  animation: floatCard 3s ease-in-out infinite;
-}
-
-@keyframes floatCard {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-input, button, select {
-  width: 90%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 12px;
-  border: none;
-  font-size: 1em;
-  outline: none;
-}
-
-input {
-  background: #ffffffdd;
-  color: #000;
+textarea {
+    resize: vertical;
+    min-height: 120px;
 }
 
 button {
-  background: linear-gradient(135deg, #00c6ff, #0072ff);
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background-color: #0074D9;
+    color: white;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-top: 10px;
+    transition: background 0.3s;
 }
 
 button:hover {
-  background: linear-gradient(135deg, #0072ff, #00c6ff);
-  transform: scale(1.05);
+    background-color: #005fa3;
 }
 
 .flash {
-  background: rgba(255, 255, 255, 0.15);
-  padding: 10px;
-  border-radius: 8px;
-  color: yellow;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-a {
-  color: #ffeb3b;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
+    background-color: #dff0d8;
+    color: #3c763d;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #d6e9c6;
 }
 
 .logout-btn {
-  display: inline-block;
-  padding: 10px 20px;
-  background: crimson;
-  color: white;
-  border-radius: 10px;
-  margin-top: 20px;
-  text-decoration: none;
-  transition: background 0.3s ease;
+    background-color: #ff4136;
+    margin-top: 20px;
 }
 
-.logout-btn:hover {
-  background: darkred;
+a {
+    color: #ffdc00;
+    text-decoration: none;
+    font-weight: bold;
 }
 
-.styled-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  font-size: 0.9em;
-  color: #fff;
+a:hover {
+    text-decoration: underline;
 }
-
-.styled-table thead tr {
-  background-color: #009879;
-  color: #ffffff;
-  text-align: left;
-}
-
-.styled-table th,
-.styled-table td {
-  padding: 12px 15px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.styled-table tbody tr {
-  background-color: rgba(255, 255, 255, 0.05);
-  transition: background 0.3s ease;
-}
-
-.styled-table tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-@media (max-width: 600px) {
-  .glass-card {
-    padding: 20px;
-    width: 95%;
-  }
-
-  .styled-table th, .styled-table td {
-    font-size: 0.8em;
-  }
-  }
