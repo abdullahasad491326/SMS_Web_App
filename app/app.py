@@ -1,16 +1,19 @@
-from flask import Flask, render_template, request, redirect, session, flash
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-from datetime import datetime
+from flask import Flask, render_template, request, redirect, url_for, session
+import sqlite3
+import datetime
 import requests
-import database as db
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
-limiter = Limiter(get_remote_address, app=app)
+app.secret_key = 'supersecret'
 
-ADMIN_USER = "PAKCYBER"
-ADMIN_PASS = "24113576"
+# ADMIN LOGIN
+ADMIN_USER = 'PAKCYBER'
+ADMIN_PASS = '030411'
+
+def get_db():
+    conn = sqlite3.connect('users.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
 @app.route('/')
 def home():
@@ -21,12 +24,14 @@ def register():
     if request.method == 'POST':
         phone = request.form['phone']
         password = request.form['password']
-        if db.user_exists(phone):
-            flash("❌ User already exists.", "error")
-        else:
-            db.add_user(phone, password)
-            flash("✅ Account created successfully!", "success")
-            return redirect('/login')
+        con = get_db()
+        cur = con.cursor()
+        cur.execute("SELECT * FROM users WHERE phone=?", (phone,))
+        if cur.fetchone():
+            return "User already exists!"
+        cur.execute("INSERT INTO users (phone, password, coins, blocked) VALUES (?, ?, ?, ?)", (phone, password, 25, 0))
+        con.commit()
+        return redirect('/login')
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -34,58 +39,17 @@ def login():
     if request.method == 'POST':
         phone = request.form['phone']
         password = request.form['password']
-        if db.verify_user(phone, password):
-            session['user'] = phone
-            flash("✅ Login successful.", "success")
+        con = get_db()
+        cur = con.cursor()
+        cur.execute("SELECT * FROM users WHERE phone=? AND password=?", (phone, password))
+        user = cur.fetchone()
+        if user:
+            if user['blocked']:
+                return "User blocked"
+            session['user'] = user['phone']
             return redirect('/dashboard')
-        else:
-            flash("❌ Invalid credentials.", "error")
+        return "Invalid credentials"
     return render_template('login.html')
-
-@app.route('/dashboard', methods=['GET', 'POST'])
-@limiter.limit("10/minute")
-def dashboard():
-    if 'user' not in session:
-        return redirect('/login')
-    phone = session['user']
-    user_data = db.get_user(phone)
-    if request.method == 'POST':
-        if db.is_blocked(phone):
-            flash("🚫 You are blocked from sending SMS.", "error")
-        elif user_data['coins'] <= 0:
-            flash("💸 Not enough coins to send SMS.", "error")
-        else:
-            to = request.form['to']
-            message = request.form['message']
-            payload = {
-                "Code": 1234,
-                "Mobile": to,
-                "Message": message
-            }
-            headers = {
-                "accept": "application/json",
-                "content-type": "application/json",
-                "user-agent": "okhttp/4.9.2"
-            }
-            try:
-                res = requests.post("https://api.crownone.app/api/v1/Registration/verifysms",
-                                    json=payload, headers=headers, timeout=10)
-                if res.status_code == 200:
-                    db.update_coins(phone, -1)
-                    db.log_sms(phone, to, message)
-                    flash("✅ Message sent successfully.", "success")
-                else:
-                    flash("❌ Failed to send SMS.", "error")
-            except Exception as e:
-                flash(f"⚠️ API Error: {str(e)}", "error")
-        return redirect('/dashboard')  # Prevent resend on refresh
-    return render_template('dashboard.html', coins=user_data['coins'])
-
-@app.route('/logout')
-def logout():
-    session.pop('user', None)
-    session.pop('admin', None)
-    return redirect('/login')
 
 @app.route('/admin_', methods=['GET', 'POST'])
 def admin_login():
@@ -93,39 +57,66 @@ def admin_login():
         username = request.form['username']
         password = request.form['password']
         if username == ADMIN_USER and password == ADMIN_PASS:
-            session['admin'] = username
+            session['admin'] = True
             return redirect('/admin_panel')
-        else:
-            flash("❌ Invalid admin credentials", "error")
+        return "Wrong admin credentials"
     return render_template('admin_login.html')
 
-@app.route('/admin_panel', methods=['GET', 'POST'])
+@app.route('/admin_panel')
 def admin_panel():
     if 'admin' not in session:
         return redirect('/admin_')
-    if request.method == 'POST':
-        action = request.form.get('action')
-        phone = request.form.get('phone')
-        if action == 'add':
-            try:
-                coins = int(request.form.get('coins'))
-                if db.user_exists(phone):
-                    db.update_coins(phone, coins)
-                    flash(f"✅ {coins} coins added to {phone}", "success")
-                else:
-                    flash("❌ User not found.", "error")
-            except:
-                flash("⚠️ Invalid coin amount.", "error")
-        elif action == 'block':
-            db.block_user(phone)
-            flash(f"🚫 User {phone} blocked.", "error")
-        elif action == 'unblock':
-            db.unblock_user(phone)
-            flash(f"✅ User {phone} unblocked.", "success")
-    users = db.get_all_users()
-    logs = db.get_sms_logs()
-    blocked = db.get_blocked_users()
-    return render_template('admin_panel.html', users=users, logs=logs, blocked=blocked)
+    con = get_db()
+    users = con.execute("SELECT * FROM users").fetchall()
+    logs = con.execute("SELECT * FROM messages ORDER BY id DESC").fetchall()
+    return render_template('admin_panel.html', users=users, logs=logs)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/dashboard', methods=['GET', 'POST'])
+def dashboard():
+    if 'user' not in session:
+        return redirect('/login')
+    phone = session['user']
+    con = get_db()
+    cur = con.cursor()
+    user = cur.execute("SELECT * FROM users WHERE phone=?", (phone,)).fetchone()
+
+    if request.method == 'POST':
+        to = request.form['to']
+        message = request.form['message']
+        if user['coins'] <= 0:
+            return "Not enough coins"
+        payload = {
+            "Code": "123456",
+            "Mobile": to,
+            "Message": message
+        }
+        requests.post("https://api.crownone.app/api/v1/Registration/verifysms", json=payload)
+        new_coins = user['coins'] - 1
+        cur.execute("UPDATE users SET coins=? WHERE phone=?", (new_coins, phone))
+        cur.execute("INSERT INTO messages (sender, receiver, message, time) VALUES (?, ?, ?, ?)", (phone, to, message, datetime.datetime.now()))
+        con.commit()
+        return redirect('/dashboard')
+
+    return render_template('dashboard.html', coins=user['coins'])
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/login')
+
+@app.route('/admin_action', methods=['POST'])
+def admin_action():
+    if 'admin' not in session:
+        return redirect('/admin_')
+    phone = request.form['phone']
+    con = get_db()
+    cur = con.cursor()
+    if 'add' in request.form:
+        coins = int(request.form['coins'])
+        cur.execute("UPDATE users SET coins = coins + ? WHERE phone=?", (coins, phone))
+    elif 'block' in request.form:
+        cur.execute("UPDATE users SET blocked = 1 WHERE phone=?", (phone,))
+    elif 'unblock' in request.form:
+        cur.execute("UPDATE users SET blocked = 0 WHERE phone=?", (phone,))
+    con.commit()
+    return redirect('/admin_panel')
