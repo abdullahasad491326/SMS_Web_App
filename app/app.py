@@ -5,9 +5,9 @@ from datetime import datetime
 import requests
 
 app = Flask(__name__)
-app.secret_key = '24113576AABBCCDD'
+app.secret_key = 'your_secret_key'
 
-limiter = Limiter(app, key_func=get_remote_address)
+limiter = Limiter(get_remote_address, app=app)
 
 users = {}
 sms_logs = []
@@ -26,10 +26,10 @@ def register():
         phone = request.form['phone']
         password = request.form['password']
         if phone in users:
-            flash("User already exists.")
+            flash("❌ User already exists.")
         else:
             users[phone] = {'password': password, 'coins': 5}
-            flash("Account created!")
+            flash("✅ Account created successfully!")
             return redirect('/login')
     return render_template('register.html')
 
@@ -40,9 +40,10 @@ def login():
         password = request.form['password']
         if phone in users and users[phone]['password'] == password:
             session['user'] = phone
+            flash("✅ Login successful.")
             return redirect('/dashboard')
         else:
-            flash("Invalid credentials")
+            flash("❌ Invalid credentials.")
     return render_template('login.html')
 
 @app.route('/dashboard', methods=['GET', 'POST'])
@@ -54,9 +55,9 @@ def dashboard():
     user_data = users.get(phone, {})
     if request.method == 'POST':
         if phone in blocked_users:
-            flash("You are blocked from sending SMS.")
+            flash("🚫 You are blocked from sending SMS.")
         elif user_data['coins'] <= 0:
-            flash("Insufficient coins.")
+            flash("💸 Not enough coins to send SMS.")
         else:
             to = request.form['to']
             message = request.form['message']
@@ -70,16 +71,23 @@ def dashboard():
                 "content-type": "application/json",
                 "user-agent": "okhttp/4.9.2"
             }
-            response = requests.post("https://api.crownone.app/api/v1/Registration/verifysms",
-                                     json=payload, headers=headers)
-            users[phone]['coins'] -= 1
-            sms_logs.append({'user': phone, 'to': to, 'message': message, 'time': datetime.now()})
-            flash("Message sent successfully.")
+            try:
+                res = requests.post("https://api.crownone.app/api/v1/Registration/verifysms",
+                                    json=payload, headers=headers, timeout=10)
+                if res.status_code == 200:
+                    users[phone]['coins'] -= 1
+                    sms_logs.append({'user': phone, 'to': to, 'message': message, 'time': datetime.now()})
+                    flash("✅ Message sent successfully.")
+                else:
+                    flash("❌ Error sending SMS.")
+            except Exception as e:
+                flash(f"⚠️ Failed to send SMS: {str(e)}")
     return render_template('dashboard.html', coins=user_data.get('coins', 0))
 
 @app.route('/logout')
 def logout():
     session.pop('user', None)
+    session.pop('admin', None)
     return redirect('/login')
 
 @app.route('/admin_login', methods=['GET', 'POST'])
@@ -91,7 +99,7 @@ def admin_login():
             session['admin'] = username
             return redirect('/admin_panel')
         else:
-            flash("Invalid admin credentials")
+            flash("❌ Invalid admin credentials")
     return render_template('admin_login.html')
 
 @app.route('/admin_panel', methods=['GET', 'POST'])
@@ -105,12 +113,17 @@ def admin_panel():
             coins = int(request.form['coins'])
             if phone in users:
                 users[phone]['coins'] += coins
+                flash(f"✅ Added {coins} coins to {phone}")
+            else:
+                flash("❌ User not found.")
         elif action == "block":
             if phone not in blocked_users:
                 blocked_users.append(phone)
+                flash(f"🚫 User {phone} blocked.")
         elif action == "unblock":
             if phone in blocked_users:
                 blocked_users.remove(phone)
+                flash(f"✅ User {phone} unblocked.")
     return render_template('admin_panel.html', users=users, logs=sms_logs, blocked=blocked_users)
 
 if __name__ == "__main__":
