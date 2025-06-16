@@ -28,7 +28,7 @@ def register():
         if phone in users:
             flash("❌ User already exists.")
         else:
-            users[phone] = {'password': password, 'coins': 5}
+            users[phone] = {'password': password, 'coins': 0}
             flash("✅ Account created successfully!")
             return redirect('/login')
     return render_template('register.html')
@@ -106,6 +106,7 @@ def admin_login():
 def admin_panel():
     if 'admin' not in session:
         return redirect('/admin_login')
+    message = ""
     if request.method == 'POST':
         action = request.form['action']
         phone = request.form['phone']
@@ -113,18 +114,18 @@ def admin_panel():
             coins = int(request.form['coins'])
             if phone in users:
                 users[phone]['coins'] += coins
-                flash(f"✅ Added {coins} coins to {phone}")
+                message = f"✅ Added {coins} coins to {phone}"
             else:
-                flash("❌ User not found.")
+                message = "❌ User not found."
         elif action == "block":
             if phone not in blocked_users:
                 blocked_users.append(phone)
-                flash(f"🚫 User {phone} blocked.")
+                message = f"🚫 User {phone} blocked."
         elif action == "unblock":
             if phone in blocked_users:
                 blocked_users.remove(phone)
-                flash(f"✅ User {phone} unblocked.")
-    return render_template('admin_panel.html', users=users, logs=sms_logs, blocked=blocked_users)
+                message = f"✅ User {phone} unblocked."
+    return render_template('admin_panel.html', users=users, logs=sms_logs, blocked=blocked_users, message=message)
 
 if __name__ == "__main__":
     app.run(debug=True)
