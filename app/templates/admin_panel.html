@@ -1,128 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Panel - SMS App</title>
+  <meta charset="UTF-8" />
+  <title>Admin Panel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(-45deg, #1c92d2, #f2fcfe, #8360c3, #2ebf91);
-      background-size: 400% 400%;
-      animation: gradient 12s ease infinite;
-      padding: 20px;
-      color: #fff;
-    }
-
-    @keyframes gradient {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .panel-container {
-      max-width: 1000px;
-      margin: auto;
-      background-color: rgba(0, 0, 0, 0.25);
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-      backdrop-filter: blur(10px);
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    input, select, button {
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      font-size: 16px;
-    }
-
-    input, select {
-      width: 200px;
-    }
-
-    button {
-      background-color: #00c6ff;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #0072ff;
-    }
-
     table {
       width: 100%;
-      margin-top: 25px;
+      margin-top: 20px;
+      background-color: rgba(255, 255, 255, 0.9);
       border-collapse: collapse;
-      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      font-size: 14px;
     }
 
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-      color: #fff;
+    table th, table td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
     }
 
-    th {
-      background-color: rgba(0,0,0,0.3);
+    table th {
+      background-color: #4facfe;
+      color: white;
     }
 
-    .section-title {
-      margin-top: 40px;
-      font-size: 20px;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 5px;
+    .logout {
+      margin-top: 20px;
+      text-align: center;
     }
 
-    .logout-link {
-      text-align: right;
+    .logout form button {
+      background-color: red;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+
+    .form-inline input {
       margin-top: 10px;
     }
 
-    .logout-link a {
-      color: yellow;
-      text-decoration: underline;
-    }
-
-    @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr {
-        display: block;
-      }
-
-      td {
-        border: none;
-        padding: 10px 0;
-      }
-
-      td::before {
-        content: attr(data-label);
-        font-weight: bold;
-        display: block;
-        color: #ccc;
-      }
+    h2 {
+      color: white;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div class="panel-container">
-    <h2>🛠️ Admin Dashboard</h2>
+  <div class="card-container">
+    <h2>📊 Admin Dashboard</h2>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -131,65 +59,53 @@
     {% endwith %}
 
     <form method="POST">
-      <div class="form-group">
-        <input type="text" name="phone" placeholder="User Phone" required>
-        <select name="action" required>
-          <option value="" disabled selected>Action</option>
-          <option value="add">Add Coins</option>
-          <option value="block">Block User</option>
-          <option value="unblock">Unblock User</option>
-        </select>
-        <input type="number" name="coins" placeholder="Coins (for Add)">
-        <button type="submit">Submit</button>
-      </div>
+      <input type="text" name="phone" placeholder="Enter Phone Number" required>
+      <input type="number" name="coins" placeholder="Coins to Add">
+      <button type="submit" name="action" value="add">➕ Add Coins</button>
+      <button type="submit" name="action" value="block">🚫 Block</button>
+      <button type="submit" name="action" value="unblock">✅ Unblock</button>
     </form>
 
-    <div class="section-title">📱 All Users</div>
+    <h3 style="margin-top: 30px; color:white;">👥 Users</h3>
     <table>
-      <thead>
-        <tr>
-          <th>Phone</th>
-          <th>Password</th>
-          <th>Coins</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for phone, data in users.items() %}
+      <tr>
+        <th>Phone</th>
+        <th>Password</th>
+        <th>Coins</th>
+        <th>Status</th>
+      </tr>
+      {% for phone, data in users.items() %}
         <tr>
           <td>{{ phone }}</td>
           <td>{{ data.password }}</td>
           <td>{{ data.coins }}</td>
-          <td>{% if phone in blocked %}Blocked{% else %}Active{% endif %}</td>
+          <td>{{ 'Blocked' if phone in blocked else 'Active' }}</td>
         </tr>
-        {% endfor %}
-      </tbody>
+      {% endfor %}
     </table>
 
-    <div class="section-title">📨 Message Logs</div>
+    <h3 style="margin-top: 30px; color:white;">📬 SMS Logs</h3>
     <table>
-      <thead>
-        <tr>
-          <th>User</th>
-          <th>To</th>
-          <th>Message</th>
-          <th>Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for log in logs %}
+      <tr>
+        <th>User</th>
+        <th>To</th>
+        <th>Message</th>
+        <th>Time</th>
+      </tr>
+      {% for log in logs %}
         <tr>
           <td>{{ log.user }}</td>
           <td>{{ log.to }}</td>
           <td>{{ log.message }}</td>
-          <td>{{ log.time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+          <td>{{ log.time }}</td>
         </tr>
-        {% endfor %}
-      </tbody>
+      {% endfor %}
     </table>
 
-    <div class="logout-link">
-      <a href="/logout">🚪 Logout</a>
+    <div class="logout">
+      <form action="/logout" method="GET">
+        <button>Logout</button>
+      </form>
     </div>
   </div>
 </body>
