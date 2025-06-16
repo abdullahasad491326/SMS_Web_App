@@ -1,47 +1,100 @@
-# database.py
+import sqlite3
+from datetime import datetime
 
-users = {}
-sms_logs = []
-blocked_users = []
+def create_tables():
+    conn = sqlite3.connect("sms.db")
+    c = conn.cursor()
 
-def get_users():
-    return users
+    c.execute('''CREATE TABLE IF NOT EXISTS users (
+                 phone TEXT PRIMARY KEY,
+                 password TEXT NOT NULL,
+                 coins INTEGER DEFAULT 10,
+                 blocked INTEGER DEFAULT 0
+                 )''')
 
-def get_logs():
-    return sms_logs
+    c.execute('''CREATE TABLE IF NOT EXISTS messages (
+                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                 user TEXT,
+                 to_number TEXT,
+                 message TEXT,
+                 time TEXT
+                 )''')
 
-def get_blocked_users():
-    return blocked_users
+    conn.commit()
+    conn.close()
 
-def add_user(phone, password):
-    users[phone] = {'password': password, 'coins': 0}
+def register_user(phone, password):
+    conn = sqlite3.connect("sms.db")
+    c = conn.cursor()
+    c.execute("INSERT INTO users (phone, password) VALUES (?, ?)", (phone, password))
+    conn.commit()
+    conn.close()
 
-def user_exists(phone):
-    return phone in users
+def validate_login(phone, password):
+    conn = sqlite3.connect("sms.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE phone = ? AND password = ?", (phone, password))
+    result = c.fetchone()
+    conn.close()
+    return result
 
-def check_password(phone, password):
-    return users[phone]['password'] == password
-
-def get_user_data(phone):
-    return users.get(phone)
+def get_user(phone):
+    conn = sqlite3.connect("sms.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE phone = ?", (phone,))
+    result = c.fetchone()
+    conn.close()
+    return result
 
 def deduct_coin(phone):
-    if users[phone]['coins'] > 0:
-        users[phone]['coins'] -= 1
+    conn = sqlite3.connect("sms.db")
+    c = conn.cursor()
+    c.execute("UPDATE users SET coins = coins - 1 WHERE phone = ?", (phone,))
+    conn.commit()
+    conn.close()
 
-def add_log(user, to, message, time):
-    sms_logs.append({'user': user, 'to': to, 'message': message, 'time': time})
+def log_message(user, to, message):
+    conn = sqlite3.connect("sms.db")
+    c = conn.cursor()
+    time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    c.execute("INSERT INTO messages (user, to_number, message, time) VALUES (?, ?, ?, ?)", (user, to, message, time))
+    conn.commit()
+    conn.close()
 
-def add_coins(phone, coins):
-    users[phone]['coins'] += coins
+def get_users():
+    conn = sqlite3.connect("sms.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM users")
+    users = c.fetchall()
+    conn.close()
+    return users
 
-def is_blocked(phone):
-    return phone in blocked_users
+def get_messages():
+    conn = sqlite3.connect("sms.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM messages")
+    messages = c.fetchall()
+    conn.close()
+    return messages
+
+def add_coins(phone, amount):
+    conn = sqlite3.connect("sms.db")
+    c = conn.cursor()
+    c.execute("UPDATE users SET coins = coins + ? WHERE phone = ?", (amount, phone))
+    conn.commit()
+    conn.close()
 
 def block_user(phone):
-    if phone not in blocked_users:
-        blocked_users.append(phone)
+    conn = sqlite3.connect("sms.db")
+    c = conn.cursor()
+    c.execute("UPDATE users SET blocked = 1 WHERE phone = ?", (phone,))
+    conn.commit()
+    conn.close()
 
 def unblock_user(phone):
-    if phone in blocked_users:
-        blocked_users.remove(phone)
+    conn = sqlite3.connect("sms.db")
+    c = conn.cursor()
+    c.execute("UPDATE users SET blocked = 0 WHERE phone = ?", (phone,))
+    conn.commit()
+    conn.close()
+    
