@@ -1,126 +1,139 @@
-from flask import Flask, render_template, request, redirect, session, url_for
-import database
+from flask import Flask, render_template, request, redirect, session, flash
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from datetime import datetime
 import requests
+import database
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key'
+app.secret_key = 'your_secret_key'
 
-# Create tables at startup
-database.create_tables()
+limiter = Limiter(get_remote_address, app=app)
 
-# Home page
+ADMIN_USER = "PAKCYBER"
+ADMIN_PASS = "24113576"
+
+# Initialize database tables
+database.init_db()
+
 @app.route('/')
 def home():
-    return redirect(url_for('login'))
+    return redirect('/login')
 
-# Register page
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         phone = request.form['phone']
         password = request.form['password']
-        user = database.get_user(phone)
-        if user:
-            return "User already exists."
-        database.register_user(phone, password)
-        return redirect('/login')
+        if database.get_user(phone):
+            flash("❌ User already exists.")
+        else:
+            database.create_user(phone, password)
+            flash("✅ Account created successfully!")
+            return redirect('/login')
     return render_template('register.html')
 
-# Login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         phone = request.form['phone']
         password = request.form['password']
-        user = database.validate_login(phone, password)
-        if user and user[3] == 0:  # Not blocked
+        user = database.get_user(phone)
+        if user and user['password'] == password:
             session['user'] = phone
+            flash("✅ Login successful.")
             return redirect('/dashboard')
-        elif user and user[3] == 1:
-            return "You are blocked."
-        return "Invalid login."
+        else:
+            flash("❌ Invalid credentials.")
     return render_template('login.html')
 
-# Dashboard
 @app.route('/dashboard', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")
 def dashboard():
     if 'user' not in session:
         return redirect('/login')
 
-    user = database.get_user(session['user'])
+    phone = session['user']
+    user = database.get_user(phone)
+    blocked = database.is_blocked(phone)
 
-    message_status = None
     if request.method == 'POST':
-        to_number = request.form['to_number']
-        message = request.form['message']
-
-        if user[2] <= 0:
-            message_status = "Insufficient coins!"
+        if blocked:
+            flash("🚫 You are blocked from sending SMS.")
+        elif user['coins'] <= 0:
+            flash("💸 Not enough coins to send SMS.")
         else:
-            # Send SMS
-            response = requests.post("https://api.crownone.app/api/v1/Registration/verifysms", json={
-                "Code": "1234",
-                "Mobile": to_number,
+            to = request.form['to']
+            message = request.form['message']
+            payload = {
+                "Code": 1234,
+                "Mobile": to,
                 "Message": message
-            })
+            }
+            headers = {
+                "accept": "application/json",
+                "content-type": "application/json",
+                "user-agent": "okhttp/4.9.2"
+            }
+            try:
+                response = requests.post("https://api.crownone.app/api/v1/Registration/verifysms", json=payload, headers=headers, timeout=10)
+                if response.status_code == 200:
+                    database.update_user_coins(phone, user['coins'] - 1)
+                    database.log_sms(phone, to, message)
+                    flash("✅ Message sent successfully.")
+                else:
+                    flash("❌ Failed to send message.")
+            except Exception as e:
+                flash("⚠️ Network error.")
 
-            if response.status_code == 200:
-                database.log_message(session['user'], to_number, message)
-                database.deduct_coin(session['user'])
-                message_status = "Message sent successfully."
-            else:
-                message_status = "Failed to send message."
+    updated_user = database.get_user(phone)
+    return render_template("dashboard.html", coins=updated_user['coins'])
 
-        # Reload updated coin balance
-        user = database.get_user(session['user'])
-
-    return render_template('dashboard.html', coins=user[2], message_status=message_status)
-
-# Logout
 @app.route('/logout')
 def logout():
-    session.clear()
+    session.pop('user', None)
+    session.pop('admin', None)
     return redirect('/login')
 
-# Admin login
-@app.route('/admin_', methods=['GET', 'POST'])
+@app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == 'PAKCYBER' and password == '24113576':
-            session['admin'] = True
+        if username == ADMIN_USER and password == ADMIN_PASS:
+            session['admin'] = username
             return redirect('/admin_panel')
-        return "Invalid admin credentials"
+        else:
+            flash("❌ Invalid admin credentials")
     return render_template('admin_login.html')
 
-# Admin Panel
 @app.route('/admin_panel', methods=['GET', 'POST'])
 def admin_panel():
-    if not session.get('admin'):
-        return redirect('/admin_')
-
-    message = None
+    if 'admin' not in session:
+        return redirect('/admin_login')
 
     if request.method == 'POST':
-        phone = request.form['phone']
-        coins = request.form.get('coins')
-        action = request.form['action']
-
-        if action == 'add':
-            database.add_coins(phone, int(coins))
-            message = f"Added {coins} coins to {phone}"
-        elif action == 'block':
+        action = request.form.get('action')
+        phone = request.form.get('phone')
+        if action == "add":
+            coins = int(request.form.get('coins', 0))
+            user = database.get_user(phone)
+            if user:
+                database.update_user_coins(phone, user['coins'] + coins)
+                flash(f"✅ Added {coins} coins to {phone}")
+            else:
+                flash("❌ User not found.")
+        elif action == "block":
             database.block_user(phone)
-            message = f"{phone} blocked"
-        elif action == 'unblock':
+            flash(f"🚫 {phone} blocked.")
+        elif action == "unblock":
             database.unblock_user(phone)
-            message = f"{phone} unblocked"
+            flash(f"✅ {phone} unblocked.")
 
     users = database.get_all_users()
-    messages = database.get_all_messages()
-    return render_template('admin_panel.html', users=users, logs=messages, message=message)
+    logs = database.get_sms_logs()
+    blocked = database.get_blocked_users()
+    return render_template('admin_panel.html', users=users, logs=logs, blocked=blocked)
 
-# Run app
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
