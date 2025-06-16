@@ -1,125 +1,105 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  animation: bgMove 20s linear infinite;
-  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #4c00ff, #7209b7, #ff006e);
+  background-size: 600% 600%;
+  animation: gradientMove 12s ease infinite;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
 }
 
-@keyframes bgMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+@keyframes gradientMove {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
 }
 
 .card-container {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  backdrop-filter: blur(15px);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  padding: 30px;
-  width: 95%;
-  max-width: 400px;
-  color: #fff;
-  text-align: center;
-  animation: fadeIn 0.6s ease-in-out;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 20px;
 }
 
 .glass-card {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-h2 {
-  margin-bottom: 10px;
-  font-size: 24px;
-}
-
-input, textarea, select {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  padding: 30px;
   width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-}
-
-textarea {
-  height: 100px;
-  resize: vertical;
-}
-
-button {
-  background: #ff6f61;
+  max-width: 400px;
   color: white;
-  font-weight: bold;
-  border: none;
-  border-radius: 12px;
-  padding: 12px;
-  margin-top: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-button:hover {
-  background: #e85a4f;
-  transform: translateY(-2px);
-}
-
-a {
-  color: #ffe0b2;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.flash {
-  background: #ffeb3b;
-  color: black;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-}
-
-.logout-btn {
-  background-color: #f44336;
-  color: #fff;
-  margin-top: 10px;
-}
-
-.admin-table {
-  width: 100%;
-  margin-top: 15px;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-.admin-table th, .admin-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  color: #fff;
-}
-
-.admin-table th {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-@media (max-width: 480px) {
-  .card-container {
-    padding: 20px;
-    width: 90%;
-  }
-
-  button, input, textarea {
-    font-size: 15px;
-  }
+  animation: fadeIn 1s ease;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-    }
+  from {opacity: 0; transform: translateY(20px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+.glass-card h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 26px;
+}
+
+input[type="text"], input[type="password"], input[type="number"], textarea, select {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+textarea {
+  min-height: 80px;
+}
+
+input::placeholder, textarea::placeholder, select {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: #00c896;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #00a87c;
+}
+
+a {
+  color: #ffe600;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.flash {
+  padding: 10px;
+  background-color: #ff0054;
+  color: white;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 15px;
+}
