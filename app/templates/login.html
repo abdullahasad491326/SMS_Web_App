@@ -3,27 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <title>Login - SMS App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="card-container">
     <div class="glass-card">
-      <h2>🔐 Login to SMS App</h2>
-
+      <h2>🔐 User Login</h2>
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <div class="flash">{{ messages[0] }}</div>
         {% endif %}
       {% endwith %}
-
       <form action="/login" method="POST">
-        <input type="text" name="phone" placeholder="📱 Phone Number" required>
-        <input type="password" name="password" placeholder="🔑 Password" required>
+        <input type="text" name="phone" placeholder="Enter Phone Number" required>
+        <input type="password" name="password" placeholder="Enter Password" required>
         <button type="submit">Login</button>
       </form>
-
-      <p>New here? <a href="/register">Create an account</a></p>
+      <p style="margin-top: 10px;">New here? 
+        <a href="/register" style="color: #00f; text-decoration: underline;">Register Now</a>
+      </p>
     </div>
   </div>
 </body>
