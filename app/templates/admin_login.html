@@ -1,27 +1,26 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Admin Login - SMS App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="card-container">
     <div class="glass-card">
-      <h2>🔐 Admin Login</h2>
+      <h2>👮 Admin Login</h2>
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <div class="flash">{{ messages[0] }}</div>
         {% endif %}
       {% endwith %}
-      <form action="/admin_login" method="POST">
+      <form method="POST">
         <input type="text" name="username" placeholder="👤 Admin Username" required>
-        <input type="password" name="password" placeholder="🔐 Password" required>
+        <input type="password" name="password" placeholder="🔐 Admin Password" required>
         <button type="submit">Login</button>
       </form>
-      <p style="margin-top:10px;"><a href="/login">🔙 Back to User Login</a></p>
+      <p><a href="/">⬅️ Back to Home</a></p>
     </div>
   </div>
 </body>
