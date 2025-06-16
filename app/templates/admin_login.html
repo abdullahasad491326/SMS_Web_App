@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Admin Login - SMS App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -15,9 +15,9 @@
           <div class="flash">{{ messages[0] }}</div>
         {% endif %}
       {% endwith %}
-      <form action="/admin_login" method="POST">
-        <input type="text" name="username" placeholder="👤 Admin Username" required>
-        <input type="password" name="password" placeholder="🔑 Password" required>
+      <form method="POST">
+        <input type="text" name="username" placeholder="👤 Username" required />
+        <input type="password" name="password" placeholder="🔑 Password" required />
         <button type="submit">Login</button>
       </form>
       <p><a href="/">Back to Home</a></p>
