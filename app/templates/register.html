@@ -1,34 +1,19 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 Create Account</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>🚀 Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body class="animated-bg">
-<div class="container">
-    <div class="form-box">
+<body>
+    <div class="form-container">
         <h2>🚀 Create Account</h2>
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <div class="flash">
-              {% for message in messages %}
-                <p>{{ message }}</p>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-        <form method="post">
+        <form method="POST">
             <input type="text" name="phone" placeholder="📱 Phone Number" required>
             <input type="password" name="password" placeholder="🔐 Password" required>
             <button type="submit">Register</button>
         </form>
-        <div class="switch-link">
-            <p>Already registered?</p>
-            <a href="/login" class="switch-button">Login Here</a>
-        </div>
+        <p>Already registered? <a href="{{ url_for('login') }}">Login Here</a></p>
     </div>
-</div>
-<script src="/static/animation.js"></script>
 </body>
 </html>
