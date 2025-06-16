@@ -1,93 +1,164 @@
-/* Reset and base styles */
-body, html {
+body {
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #3f87a6, #ebf8e1, #f69d3c);
-  background-size: 600% 600%;
-  animation: gradientBG 12s ease infinite;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #4b6cb7, #182848);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: backgroundShift 10s ease infinite alternate;
 }
 
-/* Card container center */
+@keyframes backgroundShift {
+  0% {
+    background: linear-gradient(135deg, #4b6cb7, #182848);
+  }
+  100% {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+  }
+}
+
 .card-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   padding: 20px;
+  width: 100%;
 }
 
-/* Glassmorphism effect card */
+.card-container.wide {
+  max-width: 1000px;
+  margin: auto;
+  flex-direction: column;
+}
+
 .glass-card {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   padding: 30px;
-  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
   max-width: 400px;
   color: #fff;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  animation: fadeInUp 0.8s ease-out;
+  text-align: center;
+  animation: floatCard 3s ease-in-out infinite;
 }
 
-/* Form inputs */
-input, textarea, select {
-  width: 100%;
+@keyframes floatCard {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+input, button, select {
+  width: 90%;
   padding: 12px;
   margin: 10px 0;
   border-radius: 12px;
   border: none;
+  font-size: 1em;
   outline: none;
-  font-size: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  transition: 0.3s;
-}
-input::placeholder, textarea::placeholder {
-  color: #ddd;
 }
 
-/* Buttons */
+input {
+  background: #ffffffdd;
+  color: #000;
+}
+
 button {
-  width: 100%;
-  padding: 12px;
-  background-color: #007bff;
-  border: none;
-  color: white;
-  border-radius: 12px;
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: #fff;
   font-weight: bold;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+
 button:hover {
-  background-color: #0056b3;
-}
-button.logout {
-  background-color: #dc3545;
-}
-button.logout:hover {
-  background-color: #b02a37;
+  background: linear-gradient(135deg, #0072ff, #00c6ff);
+  transform: scale(1.05);
 }
 
-/* Flash messages */
 .flash {
-  background-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   padding: 10px;
-  margin: 10px 0;
-  color: #fff;
-  text-align: center;
+  border-radius: 8px;
+  color: yellow;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+a {
+  color: #ffeb3b;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.logout-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background: crimson;
+  color: white;
   border-radius: 10px;
+  margin-top: 20px;
+  text-decoration: none;
+  transition: background 0.3s ease;
 }
 
-/* Animations */
-@keyframes gradientBG {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.logout-btn:hover {
+  background: darkred;
 }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 0.9em;
+  color: #fff;
 }
+
+.styled-table thead tr {
+  background-color: #009879;
+  color: #ffffff;
+  text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 12px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.styled-table tbody tr {
+  background-color: rgba(255, 255, 255, 0.05);
+  transition: background 0.3s ease;
+}
+
+.styled-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 600px) {
+  .glass-card {
+    padding: 20px;
+    width: 95%;
+  }
+
+  .styled-table th, .styled-table td {
+    font-size: 0.8em;
+  }
+  }
