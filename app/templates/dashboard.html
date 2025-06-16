@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Dashboard - 99910 SMS WEB</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Dashboard - SMS App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="card-container">
     <div class="glass-card">
-      <h2>📨 Send SMS</h2>
-
-      <p class="coin">💰 Coins: {{ coins }}</p>
+      <h2>📲 Send SMS</h2>
+      <p style="font-weight: bold;">Coins Left: {{ coins }}</p>
 
       {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -20,13 +19,13 @@
       {% endwith %}
 
       <form action="/dashboard" method="POST">
-        <input type="text" name="to" placeholder="📞 Enter Number" required>
-        <textarea name="message" placeholder="💬 Type your SMS..." rows="4" required></textarea>
+        <input type="text" name="to" placeholder="Recipient Phone Number" required>
+        <textarea name="message" placeholder="Type your SMS message..." rows="6" maxlength="300" required></textarea>
         <button type="submit">📤 Send SMS</button>
       </form>
 
       <form action="/logout" method="GET">
-        <button type="submit" class="logout-btn">🚪 Logout</button>
+        <button type="submit" style="background-color: #d9534f; margin-top: 10px;">🚪 Logout</button>
       </form>
     </div>
   </div>
