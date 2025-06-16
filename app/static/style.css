@@ -2,104 +2,77 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #4c00ff, #7209b7, #ff006e);
-  background-size: 600% 600%;
-  animation: gradientMove 12s ease infinite;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
   min-height: 100vh;
-}
-
-@keyframes gradientMove {
-  0% {background-position: 0% 50%;}
-  50% {background-position: 100% 50%;}
-  100% {background-position: 0% 50%;}
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .card-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  padding: 20px;
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 30px;
-  width: 100%;
+  border-radius: 20px;
+  width: 90%;
   max-width: 400px;
-  color: white;
-  animation: fadeIn 1s ease;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  animation: floatUp 1.2s ease-out;
 }
 
-@keyframes fadeIn {
-  from {opacity: 0; transform: translateY(20px);}
-  to {opacity: 1; transform: translateY(0);}
+@keyframes floatUp {
+  0% {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-.glass-card h2 {
+h2 {
   text-align: center;
-  margin-bottom: 20px;
-  font-size: 26px;
+  color: white;
 }
 
-input[type="text"], input[type="password"], input[type="number"], textarea, select {
+input, button, select {
   width: 100%;
   padding: 12px;
-  margin: 10px 0;
-  border-radius: 10px;
+  margin-top: 15px;
+  border-radius: 8px;
   border: none;
   font-size: 16px;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
 }
 
-textarea {
-  min-height: 80px;
-}
-
-input::placeholder, textarea::placeholder, select {
-  color: rgba(255, 255, 255, 0.8);
+input {
+  background-color: #f0f0f0;
 }
 
 button {
-  width: 100%;
-  padding: 12px;
-  background-color: #00c896;
+  background-color: #00c6ff;
   color: white;
-  border: none;
-  border-radius: 10px;
   font-weight: bold;
-  font-size: 16px;
-  margin-top: 10px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background 0.3s;
 }
 
 button:hover {
-  background-color: #00a87c;
+  background-color: #0072ff;
 }
 
 a {
-  color: #ffe600;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-a:hover {
+  color: #fff;
   text-decoration: underline;
 }
 
 .flash {
-  padding: 10px;
-  background-color: #ff0054;
-  color: white;
-  border-radius: 8px;
-  text-align: center;
+  background-color: #fff;
+  color: #d60000;
+  padding: 8px;
   margin-bottom: 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
 }
