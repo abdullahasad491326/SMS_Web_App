@@ -1,125 +1,125 @@
-/* Universal Reset for Consistency */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-/* Background and Font Styling */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
-    color: #fff;
-    padding: 20px;
-    min-height: 100vh;
-    text-align: center;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  animation: bgMove 20s linear infinite;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Admin Form Container */
-.container {
-    max-width: 420px;
-    margin: auto;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-/* Form Titles */
-h2, h3 {
-    margin-bottom: 20px;
-    color: #ffffff;
+.card-container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  padding: 30px;
+  width: 95%;
+  max-width: 400px;
+  color: #fff;
+  text-align: center;
+  animation: fadeIn 0.6s ease-in-out;
 }
 
-/* Input Fields */
-input[type="text"],
-input[type="password"],
-input[type="number"] {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    font-size: 16px;
-    border: none;
-    border-radius: 10px;
+.glass-card {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-/* Primary Button (Blue Gradient) */
-button, .blue-btn {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(to right, #00bfff, #1e90ff);
-    border: none;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 10px;
-    margin-top: 10px;
-    cursor: pointer;
-    transition: background 0.3s ease;
+h2 {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+button {
+  background: #ff6f61;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 button:hover {
-    background: linear-gradient(to right, #1e90ff, #00bfff);
+  background: #e85a4f;
+  transform: translateY(-2px);
 }
 
-/* Special Buttons */
-.block-btn {
-    background-color: red;
-    width: 32%;
+a {
+  color: #ffe0b2;
+  text-decoration: none;
+  font-weight: 500;
 }
 
-.unblock-btn {
-    background-color: green;
-    width: 32%;
+.flash {
+  background: #ffeb3b;
+  color: black;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 10px;
 }
 
-.admin-btns {
-    display: flex;
-    justify-content: space-between;
-    gap: 5px;
-}
-
-/* Tables for User & Message Logs */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background-color: rgba(255, 255, 255, 0.05);
-    color: white;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-th, td {
-    padding: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-th {
-    background: #0099cc;
-    font-weight: bold;
-}
-
-td {
-    font-size: 14px;
-}
-
-/* Logout Button */
 .logout-btn {
-    display: inline-block;
-    margin-top: 20px;
-    background-color: crimson;
-    color: white;
-    padding: 12px 20px;
-    text-decoration: none;
-    border-radius: 10px;
-    font-weight: bold;
+  background-color: #f44336;
+  color: #fff;
+  margin-top: 10px;
 }
 
-/* Back to User Link */
-.back-link a {
-    color: yellow;
-    margin-top: 15px;
-    display: inline-block;
-    text-decoration: none;
+.admin-table {
+  width: 100%;
+  margin-top: 15px;
+  border-collapse: collapse;
+  font-size: 14px;
 }
+
+.admin-table th, .admin-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  color: #fff;
+}
+
+.admin-table th {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 480px) {
+  .card-container {
+    padding: 20px;
+    width: 90%;
+  }
+
+  button, input, textarea {
+    font-size: 15px;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+    }
