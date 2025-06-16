@@ -2,141 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard - SMS App</title>
+  <title>Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      background-size: 400% 400%;
-      animation: gradientBG 10s ease infinite;
-      color: white;
-    }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .container {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding-top: 60px;
-      min-height: 100vh;
-    }
-
-    .glass-card {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      padding: 30px;
-      width: 90%;
-      max-width: 450px;
-      text-align: center;
-    }
-
-    h2 {
-      margin-bottom: 20px;
-    }
-
-    .flash {
-      background-color: rgba(255, 255, 255, 0.2);
-      color: #fff;
-      padding: 10px;
-      margin-bottom: 15px;
-      border-radius: 10px;
-      font-size: 15px;
-    }
-
-    .info-box {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 20px;
-      font-size: 16px;
-      font-weight: 500;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-    }
-
-    input, textarea, button {
-      padding: 12px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-
-    input, textarea {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-    }
-
-    input::placeholder, textarea::placeholder {
-      color: #ddd;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-
-    button {
-      background: linear-gradient(to right, #00c6ff, #0072ff);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-    }
-
-    .logout {
-      margin-top: 15px;
-      background: #ff4d4d;
-    }
-
-    @media screen and (max-width: 500px) {
-      .glass-card {
-        padding: 20px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="container">
-    <div class="glass-card">
-      <h2>📨 SMS Dashboard</h2>
-      <div class="info-box">💰 Coins Left: {{ coins }}</div>
-
-      {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          <div class="flash">{{ messages[0] }}</div>
-        {% endif %}
-      {% endwith %}
-
-      <form method="POST">
-        <input type="text" name="to" placeholder="📱 Enter Number (e.g. 03001234567)" required>
-        <textarea name="message" placeholder="✉️ Type your message here..." required></textarea>
-        <button type="submit">🚀 Send SMS</button>
-      </form>
-
-      <form action="/logout" method="GET">
-        <button type="submit" class="logout">🔒 Logout</button>
-      </form>
-    </div>
+  <div class="card-container">
+    <h2>📨 Send SMS</h2>
+    <p style="color:white;">Your Coins: {{ coins }}</p>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+    <form method="POST">
+      <input type="text" name="to" placeholder="Receiver Phone Number" required>
+      <textarea name="message" placeholder="Type your message here" rows="5" style="width:100%; margin-top:15px; padding:10px; border-radius:8px;"></textarea>
+      <button type="submit">Send SMS</button>
+    </form>
+    <form action="/logout" method="GET" style="margin-top: 20px;">
+      <button style="background-color: red;">Logout</button>
+    </form>
   </div>
 </body>
 </html>
