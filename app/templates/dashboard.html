@@ -2,73 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard - SMS App</title>
+  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: linear-gradient(270deg, #1e3c72, #2a5298, #1e3c72);
-      background-size: 600% 600%;
-      animation: gradient 5s ease infinite;
-    }
-
-    @keyframes gradient {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
-
-    .container {
-      background-color: white;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-    }
-
-    input, textarea, button {
-      width: 90%;
-      padding: 12px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-
-    button {
-      background-color: #2a5298;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .flash {
-      color: red;
-      margin-bottom: 10px;
-    }
-  </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Send SMS</h2>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="flash">{{ messages[0] }}</div>
-      {% endif %}
-    {% endwith %}
-    <form method="POST" action="/dashboard">
-      <input type="text" name="to" placeholder="Send To (03xxxxxxxxx)" required>
-      <textarea name="message" placeholder="Enter your message" required></textarea>
-      <button type="submit">Send SMS</button>
-    </form>
-    <p><a href="/logout">Logout</a></p>
+  <div class="card-container">
+    <div class="glass-card">
+      <h2>📤 Send SMS</h2>
+      <p>Coins Left: {{ coins }}</p>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash">{{ messages[0] }}</div>
+        {% endif %}
+      {% endwith %}
+      <form method="POST">
+        <input type="text" name="to" placeholder="📞 Recipient Number" required>
+        <input type="text" name="message" placeholder="✉️ Your Message" required>
+        <button type="submit">Send SMS</button>
+      </form>
+      <br>
+      <a href="/logout">🔚 Logout</a>
+    </div>
   </div>
 </body>
 </html>
