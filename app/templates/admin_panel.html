@@ -2,155 +2,106 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Panel</title>
+  <title>Admin Panel - SMS App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
-    .admin-container {
-      padding: 30px;
-      max-width: 1000px;
-      margin: auto;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 15px;
-      box-shadow: 0 0 10px #888;
-    }
-
-    .admin-container h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 2rem;
-    }
-
-    form {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 30px;
-    }
-
-    input, select, button {
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 1rem;
-    }
-
-    input[type="text"], input[type="number"], select {
-      width: 200px;
-    }
-
-    button {
-      background-color: #4caf50;
-      color: white;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background-color: #45a049;
-    }
-
     table {
       width: 100%;
+      margin-top: 20px;
       border-collapse: collapse;
-      margin-bottom: 30px;
     }
-
     th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-      background-color: #f9f9f9;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
     }
-
     th {
       background-color: #3f51b5;
       color: white;
     }
-
-    .logout-link {
-      text-align: center;
+    .admin-actions {
       margin-top: 20px;
     }
-
-    .logout-link a {
-      padding: 10px 20px;
-      background-color: #f44336;
-      color: white;
+    .admin-actions input, .admin-actions select {
+      margin: 5px;
+      padding: 10px;
       border-radius: 8px;
-      text-decoration: none;
+      border: 1px solid #ccc;
     }
-
-    .logout-link a:hover {
-      background-color: #d32f2f;
-    }
-
-    .section-title {
-      margin-top: 40px;
-      font-size: 1.5rem;
-      color: #333;
+    .logout-btn {
+      background-color: crimson;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 10px;
+      margin-top: 20px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="admin-container">
-    <h2>🔐 Admin Panel</h2>
+  <div class="card-container">
+    <div class="glass-card" style="max-width: 95vw;">
+      <h2>👑 Admin Dashboard</h2>
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <p style="color: red;">{{ messages[0] }}</p>
-      {% endif %}
-    {% endwith %}
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash">{{ messages[0] }}</div>
+        {% endif %}
+      {% endwith %}
 
-    <form method="POST">
-      <input type="text" name="phone" placeholder="User phone" required>
-      <input type="number" name="coins" placeholder="Coins to add">
-      <select name="action" required>
-        <option value="add">Add Coins</option>
-        <option value="block">Block User</option>
-        <option value="unblock">Unblock User</option>
-      </select>
-      <button type="submit">Submit</button>
-    </form>
+      <form method="POST" class="admin-actions">
+        <input type="text" name="phone" placeholder="📱 User Phone" required>
+        <input type="number" name="coins" placeholder="💰 Coins">
+        <select name="action">
+          <option value="add">➕ Add Coins</option>
+          <option value="block">🚫 Block User</option>
+          <option value="unblock">✅ Unblock User</option>
+        </select>
+        <button type="submit">Apply</button>
+      </form>
 
-    <h3 class="section-title">👥 All Users</h3>
-    <table>
-      <tr>
-        <th>Phone</th>
-        <th>Coins</th>
-        <th>Status</th>
-      </tr>
-      {% for phone, coins in users %}
+      <h3>📋 All Users</h3>
+      <table>
+        <tr>
+          <th>Phone</th>
+          <th>Password</th>
+          <th>Coins</th>
+          <th>Status</th>
+        </tr>
+        {% for phone, data in users.items() %}
         <tr>
           <td>{{ phone }}</td>
-          <td>{{ coins }}</td>
-          <td>{{ 'Blocked' if phone in blocked else 'Active' }}</td>
+          <td>{{ data.password }}</td>
+          <td>{{ data.coins }}</td>
+          <td>{{ "Blocked" if phone in blocked else "Active" }}</td>
         </tr>
-      {% endfor %}
-    </table>
+        {% endfor %}
+      </table>
 
-    <h3 class="section-title">📨 SMS Logs</h3>
-    <table>
-      <tr>
-        <th>Sender</th>
-        <th>Receiver</th>
-        <th>Message</th>
-        <th>Time</th>
-      </tr>
-      {% for log in logs %}
+      <h3>📨 SMS Logs</h3>
+      <table>
         <tr>
-          <td>{{ log[0] }}</td>
-          <td>{{ log[1] }}</td>
-          <td>{{ log[2] }}</td>
-          <td>{{ log[3] }}</td>
+          <th>User</th>
+          <th>To</th>
+          <th>Message</th>
+          <th>Time</th>
         </tr>
-      {% endfor %}
-    </table>
+        {% for log in logs %}
+        <tr>
+          <td>{{ log.user }}</td>
+          <td>{{ log.to }}</td>
+          <td>{{ log.message }}</td>
+          <td>{{ log.time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        </tr>
+        {% endfor %}
+      </table>
 
-    <div class="logout-link">
-      <a href="/logout">Logout</a>
+      <form action="/logout" method="GET">
+        <button class="logout-btn">🚪 Logout</button>
+      </form>
     </div>
   </div>
 </body>
-                                                                   </html>
+</html>
