@@ -2,99 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Login - SMS App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(-45deg, #ff758c, #ff7eb3, #a18cd1, #fbc2eb);
-      background-size: 400% 400%;
-      animation: gradient 8s ease infinite;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: white;
-    }
-
-    @keyframes gradient {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
-
-    .container {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(14px);
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-      width: 90%;
-      max-width: 360px;
-      text-align: center;
-    }
-
-    h2 {
-      margin-bottom: 20px;
-    }
-
-    input {
-      width: 90%;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 10px;
-      border: none;
-      font-size: 16px;
-    }
-
-    button {
-      width: 95%;
-      padding: 12px;
-      background: linear-gradient(to right, #11998e, #38ef7d);
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      color: white;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-      transition: 0.3s ease;
-    }
-
-    .flash {
-      background-color: rgba(0,0,0,0.3);
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 10px;
-    }
-
-    a {
-      font-size: 14px;
-      color: #fff;
-      text-decoration: underline;
-    }
-  </style>
+  <title>Admin Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="container">
-    <h2>Admin Login</h2>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="flash">{{ messages[0] }}</div>
-      {% endif %}
-    {% endwith %}
-    <form action="/admin_login" method="POST">
-      <input type="text" name="username" placeholder="Admin Username" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Login</button>
-    </form>
-    <p><a href="/">Back to Home</a></p>
+  <div class="card-container">
+    <div class="glass-card">
+      <h2>👨‍💼 Admin Login</h2>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash">{{ messages[0] }}</div>
+        {% endif %}
+      {% endwith %}
+      <form method="POST">
+        <input type="text" name="username" placeholder="👤 Username" required>
+        <input type="password" name="password" placeholder="🔐 Password" required>
+        <button type="submit">Login</button>
+      </form>
+    </div>
   </div>
 </body>
 </html>
