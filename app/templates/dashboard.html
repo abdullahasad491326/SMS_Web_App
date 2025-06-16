@@ -7,20 +7,27 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="card">
-    <h2>📨 Send SMS</h2>
-    <p>🪙 Coins Left: {{ coins }}</p>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="flash">{{ messages[0] }}</div>
-      {% endif %}
-    {% endwith %}
-    <form method="POST">
-      <input type="text" name="to" placeholder="📞 Recipient Number" required>
-      <textarea name="message" placeholder="✉️ Your Message" required></textarea>
-      <button type="submit">Send SMS</button>
-    </form>
-    <a href="/logout">🚪 Logout</a>
+  <div class="card-container">
+    <div class="glass-card">
+      <h2>📲 SMS Dashboard</h2>
+      <p>💰 Coins Left: <strong>{{ coins }}</strong></p>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash">{{ messages[0] }}</div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST">
+        <input type="text" name="to" placeholder="Enter recipient number" required>
+        <textarea name="message" placeholder="Enter your message..." rows="4" style="resize: none;" required></textarea>
+        <button type="submit">📤 Send SMS</button>
+      </form>
+
+      <form action="/logout" method="GET">
+        <button class="logout-btn" type="submit">🚪 Logout</button>
+      </form>
+    </div>
   </div>
 </body>
 </html>
