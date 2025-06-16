@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel - SMS App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="card-container wide">
-    <div class="glass-card">
-      <h2>👑 Admin Dashboard</h2>
+  <div class="card-container">
+    <div class="glass-card large">
+      <h2>📊 Admin Panel</h2>
+
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <div class="flash">{{ messages[0] }}</div>
@@ -17,62 +18,62 @@
       {% endwith %}
 
       <form method="POST">
-        <input type="text" name="phone" placeholder="📱 User Phone" required />
-        <input type="number" name="coins" placeholder="➕ Coins to Add" />
-        <div style="display: flex; gap: 10px; justify-content: center;">
-          <button type="submit" name="action" value="add">💰 Add Coins</button>
+        <input type="text" name="phone" placeholder="📱 User Phone" required>
+        <input type="number" name="coins" placeholder="💰 Coins (for add only)">
+        <div class="action-buttons">
+          <button type="submit" name="action" value="add">➕ Add Coins</button>
           <button type="submit" name="action" value="block">🚫 Block</button>
           <button type="submit" name="action" value="unblock">✅ Unblock</button>
         </div>
       </form>
 
-      <h3 style="margin-top: 25px;">📋 Users</h3>
-      <table class="styled-table">
+      <hr>
+
+      <h3>👥 All Users</h3>
+      <table>
         <thead>
           <tr>
-            <th>📱 Phone</th>
-            <th>🔑 Password</th>
-            <th>💰 Coins</th>
-            <th>🚫 Blocked</th>
+            <th>Phone</th>
+            <th>Password</th>
+            <th>Coins</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
           {% for phone, data in users.items() %}
-          <tr>
-            <td>{{ phone }}</td>
-            <td>{{ data.password }}</td>
-            <td>{{ data.coins }}</td>
-            <td>{{ 'Yes' if phone in blocked else 'No' }}</td>
-          </tr>
+            <tr>
+              <td>{{ phone }}</td>
+              <td>{{ data.password }}</td>
+              <td>{{ data.coins }}</td>
+              <td>{% if phone in blocked %}<span style="color:red;">Blocked</span>{% else %}Active{% endif %}</td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>
 
-      <h3 style="margin-top: 25px;">📨 Message Logs</h3>
-      <table class="styled-table">
+      <h3>📨 SMS Logs</h3>
+      <table>
         <thead>
           <tr>
-            <th>📱 User</th>
-            <th>📲 To</th>
-            <th>💬 Message</th>
-            <th>⏱ Time</th>
+            <th>User</th>
+            <th>To</th>
+            <th>Message</th>
+            <th>Time</th>
           </tr>
         </thead>
         <tbody>
           {% for log in logs %}
-          <tr>
-            <td>{{ log.user }}</td>
-            <td>{{ log.to }}</td>
-            <td>{{ log.message }}</td>
-            <td>{{ log.time }}</td>
-          </tr>
+            <tr>
+              <td>{{ log.user }}</td>
+              <td>{{ log.to }}</td>
+              <td>{{ log.message }}</td>
+              <td>{{ log.time }}</td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>
 
-      <div style="margin-top: 20px; text-align: center;">
-        <a href="/logout" class="logout-btn">🚪 Logout</a>
-      </div>
+      <a href="/logout"><button class="logout-btn">🚪 Logout</button></a>
     </div>
   </div>
 </body>
