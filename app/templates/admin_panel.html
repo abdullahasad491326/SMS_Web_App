@@ -1,56 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <title>Admin Panel - SMS App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: left;
+      font-size: 14px;
+      color: #fff;
+    }
+    th {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+    h2 {
+      margin-bottom: 5px;
+    }
+    .action-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-<div class="form-box">
-    <h2>👑 Admin Dashboard</h2>
-    <form method="POST" action="/add_coins">
-        <input type="text" name="phone" placeholder="📱 User Phone" required><br>
-        <input type="number" name="coins" placeholder="➕ Coins to Add" required><br>
-        <button type="submit" class="btn">💰 Add Coins</button>
-    </form>
-    <form method="POST" action="/block_user">
-        <input type="text" name="phone" placeholder="📵 User Phone to Block" required><br>
-        <button type="submit" class="btn red">🚫 Block</button>
-    </form>
-    <form method="POST" action="/unblock_user">
-        <input type="text" name="phone" placeholder="✅ User Phone to Unblock" required><br>
-        <button type="submit" class="btn green">✔️ Unblock</button>
-    </form>
+  <div class="card-container">
+    <div class="glass-card">
+      <h2>🛠️ Admin Dashboard</h2>
 
-    <h3>📋 Users</h3>
-    <table>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash">{{ messages[0] }}</div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" class="action-form">
+        <input type="text" name="phone" placeholder="Enter user's phone number" required>
+        <input type="number" name="coins" placeholder="Coins to add (if adding)">
+        <select name="action" required>
+          <option value="">Select Action</option>
+          <option value="add">Add Coins</option>
+          <option value="block">Block User</option>
+          <option value="unblock">Unblock User</option>
+        </select>
+        <button type="submit">✅ Submit Action</button>
+      </form>
+
+      <h3>📋 Registered Users</h3>
+      <table>
         <tr>
-            <th>📱 Phone</th><th>🔑 Password</th><th>💰 Coins</th><th>🚫 Blocked</th>
+          <th>Phone</th>
+          <th>Password</th>
+          <th>Coins</th>
+          <th>Status</th>
         </tr>
-        {% for user in users %}
+        {% for phone, info in users.items() %}
         <tr>
-            <td>{{ user.phone }}</td>
-            <td>{{ user.password }}</td>
-            <td>{{ user.coins }}</td>
-            <td>{{ 'Yes' if user.blocked else 'No' }}</td>
+          <td>{{ phone }}</td>
+          <td>{{ info.password }}</td>
+          <td>{{ info.coins }}</td>
+          <td>{{ 'Blocked' if phone in blocked else 'Active' }}</td>
         </tr>
         {% endfor %}
-    </table>
+      </table>
 
-    <h3>✉️ Message Logs</h3>
-    <table>
+      <h3>📨 Message Logs</h3>
+      <table>
         <tr>
-            <th>👤 User</th><th>➡️ To</th><th>💬 Message</th><th>⏰ Time</th>
+          <th>User</th>
+          <th>To</th>
+          <th>Message</th>
+          <th>Time</th>
         </tr>
-        {% for msg in messages %}
+        {% for log in logs %}
         <tr>
-            <td>{{ msg.user }}</td>
-            <td>{{ msg.to_number }}</td>
-            <td>{{ msg.message }}</td>
-            <td>{{ msg.time }}</td>
+          <td>{{ log.user }}</td>
+          <td>{{ log.to }}</td>
+          <td>{{ log.message }}</td>
+          <td>{{ log.time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
         </tr>
         {% endfor %}
-    </table>
-    <a href="/logout"><button class="btn red">Logout</button></a>
-</div>
+      </table>
+    </div>
+  </div>
 </body>
 </html>
