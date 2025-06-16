@@ -1,89 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Admin Panel - SMS App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-      background-color: rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      text-align: left;
-      font-size: 14px;
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(-45deg, #1c92d2, #f2fcfe, #8360c3, #2ebf91);
+      background-size: 400% 400%;
+      animation: gradient 12s ease infinite;
+      padding: 20px;
       color: #fff;
     }
-    th {
-      background-color: rgba(255, 255, 255, 0.15);
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
+
+    .panel-container {
+      max-width: 1000px;
+      margin: auto;
+      background-color: rgba(0, 0, 0, 0.25);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+    }
+
     h2 {
-      margin-bottom: 5px;
+      text-align: center;
+      margin-bottom: 30px;
     }
-    .action-form {
+
+    .form-group {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    input, select, button {
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+    }
+
+    input, select {
+      width: 200px;
+    }
+
+    button {
+      background-color: #00c6ff;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0072ff;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 25px;
+      border-collapse: collapse;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      color: #fff;
+    }
+
+    th {
+      background-color: rgba(0,0,0,0.3);
+    }
+
+    .section-title {
+      margin-top: 40px;
+      font-size: 20px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+
+    .logout-link {
+      text-align: right;
       margin-top: 10px;
+    }
+
+    .logout-link a {
+      color: yellow;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      td {
+        border: none;
+        padding: 10px 0;
+      }
+
+      td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: block;
+        color: #ccc;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="card-container">
-    <div class="glass-card">
-      <h2>🛠️ Admin Dashboard</h2>
+  <div class="panel-container">
+    <h2>🛠️ Admin Dashboard</h2>
 
-      {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          <div class="flash">{{ messages[0] }}</div>
-        {% endif %}
-      {% endwith %}
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
 
-      <form method="POST" class="action-form">
-        <input type="text" name="phone" placeholder="Enter user's phone number" required>
-        <input type="number" name="coins" placeholder="Coins to add (if adding)">
+    <form method="POST">
+      <div class="form-group">
+        <input type="text" name="phone" placeholder="User Phone" required>
         <select name="action" required>
-          <option value="">Select Action</option>
+          <option value="" disabled selected>Action</option>
           <option value="add">Add Coins</option>
           <option value="block">Block User</option>
           <option value="unblock">Unblock User</option>
         </select>
-        <button type="submit">✅ Submit Action</button>
-      </form>
+        <input type="number" name="coins" placeholder="Coins (for Add)">
+        <button type="submit">Submit</button>
+      </div>
+    </form>
 
-      <h3>📋 Registered Users</h3>
-      <table>
+    <div class="section-title">📱 All Users</div>
+    <table>
+      <thead>
         <tr>
           <th>Phone</th>
           <th>Password</th>
           <th>Coins</th>
           <th>Status</th>
         </tr>
-        {% for phone, info in users.items() %}
+      </thead>
+      <tbody>
+        {% for phone, data in users.items() %}
         <tr>
           <td>{{ phone }}</td>
-          <td>{{ info.password }}</td>
-          <td>{{ info.coins }}</td>
-          <td>{{ 'Blocked' if phone in blocked else 'Active' }}</td>
+          <td>{{ data.password }}</td>
+          <td>{{ data.coins }}</td>
+          <td>{% if phone in blocked %}Blocked{% else %}Active{% endif %}</td>
         </tr>
         {% endfor %}
-      </table>
+      </tbody>
+    </table>
 
-      <h3>📨 Message Logs</h3>
-      <table>
+    <div class="section-title">📨 Message Logs</div>
+    <table>
+      <thead>
         <tr>
           <th>User</th>
           <th>To</th>
           <th>Message</th>
           <th>Time</th>
         </tr>
+      </thead>
+      <tbody>
         {% for log in logs %}
         <tr>
           <td>{{ log.user }}</td>
@@ -92,7 +185,11 @@
           <td>{{ log.time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
         </tr>
         {% endfor %}
-      </table>
+      </tbody>
+    </table>
+
+    <div class="logout-link">
+      <a href="/logout">🚪 Logout</a>
     </div>
   </div>
 </body>
