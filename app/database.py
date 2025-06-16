@@ -1,110 +1,109 @@
 import sqlite3
 from datetime import datetime
 
-# Create tables if not exist
-def create_tables():
-    conn = sqlite3.connect("sms.db")
+DB_NAME = "data.db"
+
+def init_db():
+    conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-
-    c.execute('''CREATE TABLE IF NOT EXISTS users (
-        phone TEXT PRIMARY KEY,
-        password TEXT NOT NULL,
-        coins INTEGER DEFAULT 10,
-        blocked INTEGER DEFAULT 0
-    )''')
-
-    c.execute('''CREATE TABLE IF NOT EXISTS messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user TEXT,
-        to_number TEXT,
-        message TEXT,
-        time TEXT
-    )''')
-
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            phone TEXT PRIMARY KEY,
+            password TEXT NOT NULL,
+            coins INTEGER DEFAULT 0
+        )
+    ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS sms_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user TEXT,
+            recipient TEXT,
+            message TEXT,
+            timestamp TEXT
+        )
+    ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS blocked_users (
+            phone TEXT PRIMARY KEY
+        )
+    ''')
     conn.commit()
     conn.close()
 
-# Register new user
-def register_user(phone, password):
-    conn = sqlite3.connect("sms.db")
-    c = conn.cursor()
-    c.execute("INSERT INTO users (phone, password) VALUES (?, ?)", (phone, password))
-    conn.commit()
-    conn.close()
-
-# Validate user login
-def validate_login(phone, password):
-    conn = sqlite3.connect("sms.db")
-    c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE phone = ? AND password = ?", (phone, password))
-    result = c.fetchone()
-    conn.close()
-    return result
-
-# Get single user by phone
 def get_user(phone):
-    conn = sqlite3.connect("sms.db")
+    conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
     c.execute("SELECT * FROM users WHERE phone = ?", (phone,))
-    result = c.fetchone()
+    row = c.fetchone()
     conn.close()
-    return result
+    if row:
+        return {'phone': row[0], 'password': row[1], 'coins': row[2]}
+    return None
 
-# Log SMS message
-def log_message(user, to_number, message):
-    conn = sqlite3.connect("sms.db")
+def create_user(phone, password):
+    conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-    time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    c.execute("INSERT INTO messages (user, to_number, message, time) VALUES (?, ?, ?, ?)", (user, to_number, message, time))
+    c.execute("INSERT INTO users (phone, password, coins) VALUES (?, ?, ?)", (phone, password, 0))
     conn.commit()
     conn.close()
 
-# Get all users (for admin)
+def update_user_coins(phone, coins):
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute("UPDATE users SET coins = ? WHERE phone = ?", (coins, phone))
+    conn.commit()
+    conn.close()
+
 def get_all_users():
-    conn = sqlite3.connect("sms.db")
+    conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
     c.execute("SELECT * FROM users")
-    users = c.fetchall()
+    rows = c.fetchall()
     conn.close()
-    return users
+    return [{'phone': row[0], 'password': row[1], 'coins': row[2]} for row in rows]
 
-# Get all message logs
-def get_all_messages():
-    conn = sqlite3.connect("sms.db")
+def log_sms(user, recipient, message):
+    conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-    c.execute("SELECT * FROM messages")
+    c.execute("INSERT INTO sms_logs (user, recipient, message, timestamp) VALUES (?, ?, ?, ?)",
+              (user, recipient, message, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    conn.commit()
+    conn.close()
+
+def get_sms_logs():
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute("SELECT * FROM sms_logs ORDER BY timestamp DESC")
     logs = c.fetchall()
     conn.close()
-    return logs
+    return [{'user': row[1], 'to': row[2], 'message': row[3], 'time': datetime.strptime(row[4], "%Y-%m-%d %H:%M:%S")} for row in logs]
 
-# Add coins to a user
-def add_coins(phone, amount):
-    conn = sqlite3.connect("sms.db")
-    c = conn.cursor()
-    c.execute("UPDATE users SET coins = coins + ? WHERE phone = ?", (amount, phone))
-    conn.commit()
-    conn.close()
-
-# Block user
 def block_user(phone):
-    conn = sqlite3.connect("sms.db")
+    conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-    c.execute("UPDATE users SET blocked = 1 WHERE phone = ?", (phone,))
+    c.execute("INSERT OR IGNORE INTO blocked_users (phone) VALUES (?)", (phone,))
     conn.commit()
     conn.close()
 
-# Unblock user
 def unblock_user(phone):
-    conn = sqlite3.connect("sms.db")
+    conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-    c.execute("UPDATE users SET blocked = 0 WHERE phone = ?", (phone,))
+    c.execute("DELETE FROM blocked_users WHERE phone = ?", (phone,))
     conn.commit()
     conn.close()
 
-# Deduct coins after sending message
-def deduct_coin(phone):
-    conn = sqlite3.connect("sms.db")
+def is_blocked(phone):
+    conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-    c.execute("UPDATE users SET coins = coins - 1 WHERE phone = ?", (phone,))
-    conn.commit()
+    c.execute("SELECT * FROM blocked_users WHERE phone = ?", (phone,))
+    blocked = c.fetchone()
     conn.close()
+    return blocked is not None
+
+def get_blocked_users():
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute("SELECT phone FROM blocked_users")
+    blocked = c.fetchall()
+    conn.close()
+    return [row[0] for row in blocked]
