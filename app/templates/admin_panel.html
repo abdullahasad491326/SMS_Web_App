@@ -1,168 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Panel - SMS App</title>
+  <meta charset="UTF-8" />
+  <title>Admin Panel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(-45deg, #74ebd5, #ACB6E5, #fbc2eb, #a6c0fe);
-      background-size: 400% 400%;
-      animation: gradient 10s ease infinite;
-      color: #fff;
-    }
-
-    @keyframes gradient {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
-
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    table {
-      width: 100%;
-      background-color: rgba(255,255,255,0.1);
-      border-collapse: collapse;
-      margin-bottom: 30px;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-    }
-
-    th {
-      background-color: rgba(0,0,0,0.3);
-    }
-
-    tr:hover {
-      background-color: rgba(255,255,255,0.1);
-    }
-
-    form {
-      margin-top: 30px;
-      background-color: rgba(255,255,255,0.1);
-      padding: 20px;
-      border-radius: 10px;
-    }
-
-    input, select, button {
-      padding: 10px;
-      margin: 10px 5px;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-    }
-
-    button {
-      background: linear-gradient(to right, #11998e, #38ef7d);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .message-history {
-      margin-top: 40px;
-    }
-
-    .message-history table {
-      background-color: rgba(255,255,255,0.1);
-    }
-
-    .logout-btn {
-      float: right;
-      padding: 10px 20px;
-      background: #ff4b2b;
-      border: none;
-      color: white;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: -60px;
-    }
-
-    @media (max-width: 600px) {
-      .logout-btn {
-        float: none;
-        display: block;
-        margin: 10px auto;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="container">
-    <form method="POST" action="/admin_logout">
-      <button class="logout-btn">Logout</button>
-    </form>
-
-    <h2>Admin Control Panel</h2>
-
-    <h3>Users</h3>
-    <table>
-      <tr>
-        <th>Phone</th>
-        <th>Password</th>
-        <th>Coins</th>
-        <th>Remaining</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-      {% for user in users %}
-      <tr>
-        <td>{{ user.phone }}</td>
-        <td>{{ user.password }}</td>
-        <td>{{ user.coins }}</td>
-        <td>{{ user.remaining }}</td>
-        <td>{{ 'Blocked' if user.blocked else 'Active' }}</td>
-        <td>
-          <form method="POST" action="/toggle_block">
-            <input type="hidden" name="phone" value="{{ user.phone }}">
-            <button type="submit">{{ 'Unblock' if user.blocked else 'Block' }}</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-
-    <h3>Add Coins to User</h3>
-    <form method="POST" action="/add_coins">
-      <input type="text" name="phone" placeholder="User Phone" required>
-      <input type="number" name="coins" placeholder="Coins to Add" required>
-      <button type="submit">Add Coins</button>
-    </form>
-
-    <div class="message-history">
-      <h3>Message History</h3>
-      <table>
-        <tr>
-          <th>Phone</th>
-          <th>Message</th>
-          <th>Time</th>
-        </tr>
-        {% for log in logs %}
-        <tr>
-          <td>{{ log.phone }}</td>
-          <td>{{ log.message }}</td>
-          <td>{{ log.time }}</td>
-        </tr>
+  <div class="card-container">
+    <div class="glass-card">
+      <h2>📊 Admin Panel</h2>
+      <h4>Users:</h4>
+      <ul>
+        {% for phone, data in users.items() %}
+          <li>{{ phone }} - Password: {{ data.password }} - Coins: {{ data.coins }}</li>
         {% endfor %}
-      </table>
+      </ul>
+
+      <h4>Add Coins:</h4>
+      <form method="POST">
+        <input type="hidden" name="action" value="add">
+        <input type="text" name="phone" placeholder="Phone Number" required>
+        <input type="number" name="coins" placeholder="Coins to Add" required>
+        <button type="submit">Add Coins</button>
+      </form>
+
+      <h4>Block / Unblock User:</h4>
+      <form method="POST">
+        <input type="text" name="phone" placeholder="Phone Number" required>
+        <select name="action">
+          <option value="block">Block</option>
+          <option value="unblock">Unblock</option>
+        </select>
+        <button type="submit">Update</button>
+      </form>
+
+      <h4>SMS Logs:</h4>
+      <ul>
+        {% for log in logs %}
+          <li>{{ log.user }} sent to {{ log.to }} at {{ log.time }}: {{ log.message }}</li>
+        {% endfor %}
+      </ul>
+      <br><a href="/logout">Logout</a>
     </div>
   </div>
 </body>
