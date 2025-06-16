@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <title>Admin Login - SMS App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="card-container">
     <div class="glass-card">
-      <h2>👑 Admin Login</h2>
+      <h2>🛡️ Admin Login</h2>
 
       {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -17,13 +17,13 @@
         {% endif %}
       {% endwith %}
 
-      <form method="POST">
-        <input type="text" name="username" placeholder="👤 Admin Username" required />
-        <input type="password" name="password" placeholder="🔒 Password" required />
-        <button type="submit">🔑 Login</button>
+      <form action="/admin_login" method="POST">
+        <input type="text" name="username" placeholder="👤 Admin Username" required>
+        <input type="password" name="password" placeholder="🔒 Password" required>
+        <button type="submit">Login</button>
       </form>
 
-      <p><a href="/login">← Back to User Login</a></p>
+      <p style="font-size: 12px; margin-top: 10px;">Only for authorized admins</p>
     </div>
   </div>
 </body>
