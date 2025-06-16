@@ -5,6 +5,95 @@
   <title>Register - SMS App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      background-size: 400% 400%;
+      animation: gradientBG 10s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    .card-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      color: #fff;
+      text-align: center;
+    }
+
+    .glass-card h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    input {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    input::placeholder {
+      color: #ddd;
+    }
+
+    button {
+      background: #00c6ff;
+      background: linear-gradient(to right, #0072ff, #00c6ff);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .flash {
+      background-color: rgba(255, 0, 0, 0.3);
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    a {
+      color: #ffcc00;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body>
   <div class="card-container">
@@ -16,12 +105,13 @@
         {% endif %}
       {% endwith %}
       <form action="/register" method="POST">
-        <input type="text" name="phone" placeholder="Enter Phone Number" required>
-        <input type="password" name="password" placeholder="Enter Password" required>
+        <input type="text" name="phone" placeholder="📞 Enter Phone Number" required>
+        <input type="password" name="password" placeholder="🔑 Enter Password" required>
         <button type="submit">Register</button>
       </form>
-      <p style="margin-top: 10px;">Already registered?
-        <a href="/login" style="color: #00f; text-decoration: underline;">Login Now</a>
+      <p style="margin-top: 10px;">
+        Already registered?
+        <a href="/login">Login Now</a>
       </p>
     </div>
   </div>
