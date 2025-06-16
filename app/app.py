@@ -113,23 +113,28 @@ def admin_panel():
         return redirect('/admin_login')
     
     if request.method == 'POST':
-        action = request.form['action']
-        phone = request.form['phone']
-        if action == "add":
-            coins = int(request.form['coins'])
-            current = get_user_coins(phone)
-            update_user_coins(phone, current + coins)
-            flash(f"✅ Added {coins} coins to {phone}")
-        elif action == "block":
-            block_user(phone)
-            flash(f"🚫 {phone} blocked.")
-        elif action == "unblock":
-            unblock_user(phone)
-            flash(f"✅ {phone} unblocked.")
-    
+        action = request.form.get('action')
+        phone = request.form.get('phone', '').strip()
+
+        try:
+            if action == "add":
+                coins_str = request.form.get('coins', '0').strip()
+                coins = int(coins_str) if coins_str.isdigit() else 0
+                current = get_user_coins(phone)
+                update_user_coins(phone, current + coins)
+                flash(f"✅ Added {coins} coins to {phone}")
+            elif action == "block":
+                block_user(phone)
+                flash(f"🚫 {phone} blocked.")
+            elif action == "unblock":
+                unblock_user(phone)
+                flash(f"✅ {phone} unblocked.")
+        except Exception as e:
+            flash(f"⚠️ Error: {str(e)}")
+
     users = get_all_users()
     logs = get_sms_logs()
-    return render_template('admin_panel.html', users=users, logs=logs)
+    return render_template('admin_panel.html', users=users or [], logs=logs or [])
 
 if __name__ == "__main__":
     app.run(debug=True)
