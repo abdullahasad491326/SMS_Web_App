@@ -4,11 +4,15 @@ from flask_limiter.util import get_remote_address
 from datetime import datetime
 import requests
 import sqlite3
-from database import get_user, add_user, validate_user, log_sms, get_user_coins, update_user_coins, get_all_users, block_user, unblock_user, is_blocked, get_sms_logs
+
+from database import (
+    get_user, add_user, validate_user, log_sms, get_user_coins,
+    update_user_coins, get_all_users, block_user, unblock_user,
+    is_blocked, get_sms_logs
+)
 
 app = Flask(__name__)
-app.secret_key = '44884488'
-
+app.secret_key = 'your_secret_key'
 limiter = Limiter(get_remote_address, app=app)
 
 ADMIN_USER = "PAKCYBER"
@@ -100,9 +104,10 @@ def admin_login():
         password = request.form['password']
         if username == ADMIN_USER and password == ADMIN_PASS:
             session['admin'] = username
+            flash("✅ Welcome, Admin!")
             return redirect('/admin_panel')
         else:
-            flash("❌ Invalid admin credentials")
+            flash("❌ Invalid admin credentials.")
     return render_template('admin_login.html')
 
 @app.route('/admin_panel', methods=['GET', 'POST'])
@@ -114,9 +119,13 @@ def admin_panel():
         action = request.form['action']
         phone = request.form['phone']
         if action == "add":
-            coins = int(request.form['coins'])
-            update_user_coins(phone, get_user_coins(phone) + coins)
-            flash(f"✅ Added {coins} coins to {phone}")
+            try:
+                coins = int(request.form['coins'])
+                current = get_user_coins(phone)
+                update_user_coins(phone, current + coins)
+                flash(f"✅ Added {coins} coins to {phone}")
+            except:
+                flash("❌ Failed to add coins.")
         elif action == "block":
             block_user(phone)
             flash(f"🚫 User {phone} blocked.")
@@ -130,4 +139,3 @@ def admin_panel():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    
