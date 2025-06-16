@@ -3,6 +3,5 @@ services:
     name: sms-app
     env: python
     plan: free
-    buildCommand: pip install -r app/requirements.txt
+    buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app.app:app
-    envVars: []
