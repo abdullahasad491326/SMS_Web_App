@@ -1,80 +1,76 @@
+
 body {
     font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(145deg, #001f3f, #0074D9);
-    color: #fff;
-    margin: 0;
-    padding: 0;
+    background: linear-gradient(180deg, #0f2027, #203a43, #2c5364);
+    color: white;
     text-align: center;
+    padding: 0;
+    margin: 0;
 }
 
-.form-container {
-    max-width: 400px;
-    background: #f0f0f0;
-    margin: 60px auto;
+form {
+    background: #f1f1f1;
+    color: #000;
+    border-radius: 16px;
     padding: 30px;
-    border-radius: 20px;
-    color: #333;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 350px;
+    margin: 30px auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
 }
 
-h2 {
-    margin-bottom: 20px;
-}
-
-input[type="text"],
-input[type="password"],
-textarea {
+input[type="text"], input[type="password"], textarea {
     width: 100%;
     padding: 12px;
     margin: 10px 0;
+    border: 2px solid #ddd;
     border-radius: 8px;
-    border: 1px solid #ccc;
     font-size: 16px;
-    box-sizing: border-box;
 }
 
 textarea {
+    height: 120px;
     resize: vertical;
-    min-height: 120px;
 }
 
-button {
-    background-color: #0074D9;
+button, input[type="submit"] {
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
     color: white;
-    border: none;
-    padding: 12px;
-    width: 100%;
+    padding: 12px 20px;
     font-size: 16px;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
-    border-radius: 8px;
-    margin-top: 10px;
-    transition: background 0.3s;
+    margin-top: 12px;
+    width: 100%;
 }
 
-button:hover {
-    background-color: #005fa3;
-}
-
-.flash {
-    background-color: #dff0d8;
-    color: #3c763d;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #d6e9c6;
-}
-
-.logout-btn {
-    background-color: #ff4136;
-    margin-top: 20px;
+button:hover, input[type="submit"]:hover {
+    background: linear-gradient(90deg, #0072ff, #00c6ff);
 }
 
 a {
-    color: #ffdc00;
-    text-decoration: none;
+    color: #ff0;
     font-weight: bold;
+    text-decoration: none;
 }
 
-a:hover {
-    text-decoration: underline;
+.flash {
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 5px;
+    color: #fff;
+}
+
+.flash-success {
+    background: #28a745;
+}
+
+.flash-error {
+    background: #dc3545;
+}
+
+.logout-btn {
+    margin-top: 20px;
+    background: #dc3545;
 }
