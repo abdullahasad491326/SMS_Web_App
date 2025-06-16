@@ -1,52 +1,95 @@
-<!-- templates/admin_panel.html -->
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html lang="en">
 <head>
-    <title>Admin Panel</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>👑 Admin Panel</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    .table th, .table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    .table th {
+      background-color: #6c63ff;
+      color: white;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+      background: #f0f0f5;
+      border-radius: 10px;
+    }
+    input, select, button {
+      margin: 5px 0;
+      padding: 10px;
+      width: 100%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .btn-group button {
+      flex: 1;
+    }
+  </style>
 </head>
 <body>
-<div class="card">
+  <div class="container">
     <h2>👑 Admin Panel</h2>
-    <form method="post">
-        <input type="text" name="phone" placeholder="📞 Phone Number" required><br>
-        <input type="number" name="coins" placeholder="💰 Coins to Add">
-        <button name="action" value="add" class="blue">➕ Add Coins</button>
-        <button name="action" value="block" class="red">🚫 Block User</button>
-        <button name="action" value="unblock" class="green">✅ Unblock User</button>
-    </form>
+    <form method="POST">
+      <input type="text" name="phone" placeholder="📞 Phone Number" required>
+      <input type="number" name="coins" placeholder="💰 Coins to Add">
+      <div class="btn-group">
+        <button name="action" value="add">➕ Add Coins</button>
+        <button name="action" value="block" style="background: red; color: white;">🚫 Block User</button>
+        <button name="action" value="unblock" style="background: green; color: white;">✅ Unblock User</button>
+      </div>
+    </form><h3>📱 Users</h3>
+<table class="table">
+  <tr>
+    <th>Phone</th>
+    <th>Password</th>
+    <th>Coins</th>
+    <th>Status</th>
+  </tr>
+  {% for phone, data in users.items() %}
+  <tr>
+    <td>{{ phone }}</td>
+    <td>{{ data.get('password', '') }}</td>
+    <td>{{ data.get('coins', 0) }}</td>
+    <td>{% if phone in blocked %}❌{% else %}✅{% endif %}</td>
+  </tr>
+  {% endfor %}
+</table>
 
-    <h3>📱 Users</h3>
-    <table>
-        <tr><th>Phone</th><th>Password</th><th>Coins</th><th>Status</th></tr>
-        {% for phone, data in users.items() %}
-        <tr>
-            <td>{{ phone }}</td>
-            <td>{{ data.password }}</td>
-            <td>{{ data.coins }}</td>
-            <td>
-                {% if phone in blocked %}
-                    ❌
-                {% else %}
-                    ✅
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+<h3>📄 Message Logs</h3>
+<table class="table">
+  <tr>
+    <th>User</th>
+    <th>To</th>
+    <th>Message</th>
+    <th>Time</th>
+  </tr>
+  {% for log in logs %}
+  <tr>
+    <td>{{ log['user'] }}</td>
+    <td>{{ log['to'] }}</td>
+    <td>{{ log['message'] }}</td>
+    <td>{{ log['time'] }}</td>
+  </tr>
+  {% endfor %}
+</table>
 
-    <h3>📩 Message Logs</h3>
-    <table>
-        <tr><th>User</th><th>To</th><th>Message</th><th>Time</th></tr>
-        {% for log in logs %}
-        <tr>
-            <td>{{ log.user }}</td>
-            <td>{{ log.to }}</td>
-            <td>{{ log.message }}</td>
-            <td>{{ log.time }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
+  </div>
 </body>
-</html>
+                </html>
