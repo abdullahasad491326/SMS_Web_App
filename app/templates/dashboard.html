@@ -9,21 +9,23 @@
 <body>
   <div class="card-container">
     <div class="glass-card">
-      <h2>📤 Send SMS</h2>
-      <p style="margin-bottom: 10px;"><strong>Coins:</strong> {{ coins }}</p>
+      <h2>📨 Send SMS</h2>
+      <p>💰 Coins Left: <strong>{{ coins }}</strong></p>
+
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <div class="flash">{{ messages[0] }}</div>
         {% endif %}
       {% endwith %}
+
       <form method="POST">
-        <input type="text" name="to" placeholder="📱 Target Phone Number" required>
-        <textarea name="message" placeholder="✍️ Your message here..." rows="5" required></textarea>
-        <button type="submit">Send SMS</button>
+        <input type="text" name="to" placeholder="📱 Recipient Number" required>
+        <textarea name="message" placeholder="✉️ Type your message here..." rows="5" maxlength="500" required></textarea>
+        <button type="submit">Send Message</button>
       </form>
-      <form action="/logout" method="get">
-        <button type="submit" class="logout-button">Logout</button>
-      </form>
+
+      <br>
+      <a href="/logout"><button class="logout">Logout</button></a>
     </div>
   </div>
 </body>
