@@ -1,15 +1,16 @@
-from flask import Flask, render_template, request, redirect, session, flash, url_for
+from flask import Flask, render_template, request, redirect, session, flash
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from datetime import datetime
 import requests
-import sqlite3
-
 from database import (
-    get_user, add_user, validate_user, log_sms, get_user_coins,
-    update_user_coins, get_all_users, block_user, unblock_user,
-    is_blocked, get_sms_logs
+    init_db, get_user, add_user, validate_user,
+    get_user_coins, update_user_coins, log_sms,
+    block_user, unblock_user, is_blocked,
+    get_all_users, get_sms_logs
 )
+
+init_db()
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -31,7 +32,7 @@ def register():
             flash("❌ User already exists.")
         else:
             add_user(phone, password)
-            flash("✅ Account created successfully!")
+            flash("✅ Account created!")
             return redirect('/login')
     return render_template('register.html')
 
@@ -49,7 +50,7 @@ def login():
     return render_template('login.html')
 
 @app.route('/dashboard', methods=['GET', 'POST'])
-@limiter.limit("10/minute")
+@limiter.limit("50/minute")
 def dashboard():
     if 'user' not in session:
         return redirect('/login')
@@ -60,13 +61,12 @@ def dashboard():
         return render_template('dashboard.html', coins=0)
 
     coins = get_user_coins(phone)
-
     if request.method == 'POST':
+        to = request.form['to']
+        message = request.form['message']
         if coins <= 0:
-            flash("💸 Not enough coins to send SMS.")
+            flash("💸 Not enough coins.")
         else:
-            to = request.form['to']
-            message = request.form['message']
             payload = {
                 "Code": 1234,
                 "Mobile": to,
@@ -85,16 +85,14 @@ def dashboard():
                     log_sms(phone, to, message)
                     flash("✅ Message sent successfully.")
                 else:
-                    flash("❌ Error sending SMS.")
-            except Exception as e:
-                flash(f"⚠️ Failed to send SMS: {str(e)}")
-
+                    flash("❌ Failed to send.")
+            except:
+                flash("⚠️ Network error while sending.")
     return render_template('dashboard.html', coins=get_user_coins(phone))
 
 @app.route('/logout')
 def logout():
-    session.pop('user', None)
-    session.pop('admin', None)
+    session.clear()
     return redirect('/login')
 
 @app.route('/admin_login', methods=['GET', 'POST'])
@@ -104,35 +102,31 @@ def admin_login():
         password = request.form['password']
         if username == ADMIN_USER and password == ADMIN_PASS:
             session['admin'] = username
-            flash("✅ Welcome, Admin!")
             return redirect('/admin_panel')
         else:
-            flash("❌ Invalid admin credentials.")
+            flash("❌ Invalid admin credentials")
     return render_template('admin_login.html')
 
 @app.route('/admin_panel', methods=['GET', 'POST'])
 def admin_panel():
     if 'admin' not in session:
         return redirect('/admin_login')
-
+    
     if request.method == 'POST':
         action = request.form['action']
         phone = request.form['phone']
         if action == "add":
-            try:
-                coins = int(request.form['coins'])
-                current = get_user_coins(phone)
-                update_user_coins(phone, current + coins)
-                flash(f"✅ Added {coins} coins to {phone}")
-            except:
-                flash("❌ Failed to add coins.")
+            coins = int(request.form['coins'])
+            current = get_user_coins(phone)
+            update_user_coins(phone, current + coins)
+            flash(f"✅ Added {coins} coins to {phone}")
         elif action == "block":
             block_user(phone)
-            flash(f"🚫 User {phone} blocked.")
+            flash(f"🚫 {phone} blocked.")
         elif action == "unblock":
             unblock_user(phone)
-            flash(f"✅ User {phone} unblocked.")
-
+            flash(f"✅ {phone} unblocked.")
+    
     users = get_all_users()
     logs = get_sms_logs()
     return render_template('admin_panel.html', users=users, logs=logs)
