@@ -1,72 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <title>👑 Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <div class="admin-panel">
-    <h2>🛠️ Admin Dashboard</h2>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="flash">{{ messages[0] }}</div>
-      {% endif %}
-    {% endwith %}
-    
-    <form method="POST" class="admin-form">
-      <input type="text" name="phone" placeholder="📱 User Phone" required />
-      <input type="number" name="coins" placeholder="💰 Coins (for Add)" />
-      <div class="btn-group">
-        <button name="action" value="add">➕ Add Coins</button>
-        <button name="action" value="block">🚫 Block</button>
-        <button name="action" value="unblock">✅ Unblock</button>
-      </div>
-    </form>
+    <div class="container">
+        <h2>👑 Admin Dashboard</h2>
 
-    <h3>📋 Users</h3>
-    <div class="scroll-table">
-      <table>
-        <tr>
-          <th>Phone</th>
-          <th>Password</th>
-          <th>Coins</th>
-          <th>Status</th>
-        </tr>
-        {% for phone, data in users.items() %}
-        <tr>
-          <td>{{ phone }}</td>
-          <td>{{ data.password }}</td>
-          <td>{{ data.coins }}</td>
-          <td>{% if phone in blocked %}<span style="color:red;">Blocked</span>{% else %}<span style="color:green;">Active</span>{% endif %}</td>
-        </tr>
-        {% endfor %}
-      </table>
+        <form method="post" action="/admin_action" class="form-box">
+            <input type="text" name="target_phone" placeholder="📱 User Phone" required>
+            <input type="number" name="add_coins" placeholder="💰 Coins to Add">
+            <div class="admin-btns">
+                <button type="submit" name="action" value="add" class="blue-btn">💰 Add Coins</button>
+                <button type="submit" name="action" value="block" class="block-btn">🚫 Block</button>
+                <button type="submit" name="action" value="unblock" class="unblock-btn">✅ Unblock</button>
+            </div>
+        </form>
+
+        <h3>📋 Users</h3>
+        <table>
+            <tr>
+                <th>📱 Phone</th>
+                <th>🔐 Password</th>
+                <th>💰 Coins</th>
+                <th>🚫 Blocked</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user[0] }}</td>
+                <td>{{ user[1] }}</td>
+                <td>{{ user[2] }}</td>
+                <td>{{ "✅" if user[3] == 0 else "❌" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h3>📩 Message Logs</h3>
+        <table>
+            <tr>
+                <th>📱 User</th>
+                <th>➡️ To</th>
+                <th>💬 Message</th>
+                <th>⏱️ Time</th>
+            </tr>
+            {% for log in messages %}
+            <tr>
+                <td>{{ log[0] }}</td>
+                <td>{{ log[1] }}</td>
+                <td>{{ log[2] }}</td>
+                <td>{{ log[3] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <a href="/logout" class="logout-btn">🔓 Logout</a>
     </div>
-
-    <h3>📨 SMS Logs</h3>
-    <div class="scroll-table">
-      <table>
-        <tr>
-          <th>User</th>
-          <th>To</th>
-          <th>Message</th>
-          <th>Time</th>
-        </tr>
-        {% for log in logs %}
-        <tr>
-          <td>{{ log.user }}</td>
-          <td>{{ log.to }}</td>
-          <td>{{ log.message }}</td>
-          <td>{{ log.time }}</td>
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-
-    <br>
-    <a href="/logout"><button class="logout-btn">🚪 Logout</button></a>
-  </div>
 </body>
 </html>
