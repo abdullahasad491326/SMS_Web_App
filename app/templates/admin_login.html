@@ -2,181 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Panel - SMS App</title>
+  <title>Admin Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(120deg, #1a2a6c, #b21f1f, #fdbb2d);
-      background-size: 400% 400%;
-      animation: gradient 12s ease infinite;
-      color: white;
-    }
-
-    @keyframes gradient {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
-
-    .container {
-      max-width: 95%;
-      margin: 30px auto;
-      padding: 20px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 20px;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .flash {
-      background-color: rgba(255, 0, 0, 0.3);
-      padding: 10px;
-      margin-bottom: 15px;
-      border-radius: 10px;
-      font-size: 14px;
-    }
-
-    form {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    input, select, button {
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 15px;
-    }
-
-    input {
-      width: 180px;
-      background: rgba(255,255,255,0.2);
-      color: white;
-    }
-
-    input::placeholder {
-      color: #ddd;
-    }
-
-    button {
-      background: linear-gradient(to right, #00c6ff, #0072ff);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      font-size: 14px;
-      background: rgba(255,255,255,0.1);
-    }
-
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-      text-align: center;
-    }
-
-    th {
-      background: rgba(255,255,255,0.2);
-    }
-
-    @media screen and (max-width: 600px) {
-      table, thead, tbody, th, td, tr {
-        display: block;
-      }
-
-      td {
-        text-align: left;
-        padding: 10px;
-        border: none;
-        border-bottom: 1px solid #444;
-      }
-
-      th {
-        display: none;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="container">
-    <h2>🛠️ Admin Panel</h2>
-
+  <div class="card-container">
+    <h2>👨‍💻 Admin Login</h2>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <div class="flash">{{ messages[0] }}</div>
       {% endif %}
     {% endwith %}
-
     <form method="POST">
-      <input type="text" name="phone" placeholder="Enter User Phone" required>
-      <input type="number" name="coins" placeholder="Coins to Add" min="1">
-      <button type="submit" name="action" value="add">➕ Add Coins</button>
-      <button type="submit" name="action" value="block">🚫 Block</button>
-      <button type="submit" name="action" value="unblock">✅ Unblock</button>
+      <input type="text" name="username" placeholder="Admin Username" required>
+      <input type="password" name="password" placeholder="Admin Password" required>
+      <button type="submit">Login</button>
     </form>
-
-    <h3>📋 All Users</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>📱 Phone</th>
-          <th>🔐 Password</th>
-          <th>💰 Coins</th>
-          <th>🚫 Blocked?</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for phone, data in users.items() %}
-        <tr>
-          <td>{{ phone }}</td>
-          <td>{{ data.password }}</td>
-          <td>{{ data.coins }}</td>
-          <td>{{ 'Yes' if phone in blocked else 'No' }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <h3>📨 Message Logs</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>👤 User</th>
-          <th>📞 To</th>
-          <th>📩 Message</th>
-          <th>⏰ Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for log in logs %}
-        <tr>
-          <td>{{ log.user }}</td>
-          <td>{{ log.to }}</td>
-          <td>{{ log.message }}</td>
-          <td>{{ log.time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
   </div>
 </body>
-  </html>
+</html>
