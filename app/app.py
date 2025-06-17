@@ -1,8 +1,6 @@
-
 from flask import Flask, render_template, request, redirect, session, flash
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from datetime import datetime
 import requests
 from database import (
     init_db, get_user, add_user, validate_user,
@@ -11,15 +9,15 @@ from database import (
     get_all_users, get_sms_logs
 )
 
-# Initialize the database only once when app starts
+# Initialize
 init_db()
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 limiter = Limiter(get_remote_address, app=app)
 
-ADMIN_USER = "PAKCYBER"
-ADMIN_PASS = "24113576"
+ADMIN_USERNAME = "PAKCYBER"
+ADMIN_PASSWORD = "24113576"
 
 @app.route('/')
 def home():
@@ -56,7 +54,6 @@ def login():
 def dashboard():
     if 'user' not in session:
         return redirect('/login')
-
     phone = session['user']
     if is_blocked(phone):
         flash("🚫 You are blocked from sending SMS.")
@@ -69,19 +66,17 @@ def dashboard():
         if coins <= 0:
             flash("💸 Not enough coins.")
         else:
-            payload = {
-                "Code": 1234,
-                "Mobile": to,
-                "Message": message
-            }
+            payload = {"Code": 1234, "Mobile": to, "Message": message}
             headers = {
                 "accept": "application/json",
                 "content-type": "application/json",
                 "user-agent": "okhttp/4.9.2"
             }
             try:
-                res = requests.post("https://api.crownone.app/api/v1/Registration/verifysms",
-                                    json=payload, headers=headers, timeout=10)
+                res = requests.post(
+                    "https://api.crownone.app/api/v1/Registration/verifysms",
+                    json=payload, headers=headers, timeout=10
+                )
                 if res.status_code == 200:
                     update_user_coins(phone, coins - 1)
                     log_sms(phone, to, message)
@@ -90,7 +85,6 @@ def dashboard():
                     flash("❌ Failed to send.")
             except Exception as e:
                 flash(f"⚠️ Error: {str(e)}")
-
     return render_template('dashboard.html', coins=get_user_coins(phone))
 
 @app.route('/logout')
@@ -114,14 +108,12 @@ def admin_login():
 def admin_panel():
     if 'admin' not in session:
         return redirect('/admin_login')
-
     if request.method == 'POST':
         action = request.form.get('action')
         phone = request.form.get('phone', '').strip()
         try:
             if action == "add":
-                coins_str = request.form.get('coins', '0').strip()
-                coins = int(coins_str) if coins_str.isdigit() else 0
+                coins = int(request.form.get('coins', '0').strip() or 0)
                 current = get_user_coins(phone)
                 update_user_coins(phone, current + coins)
                 flash(f"✅ Added {coins} coins to {phone}")
@@ -133,10 +125,9 @@ def admin_panel():
                 flash(f"✅ {phone} unblocked.")
         except Exception as e:
             flash(f"⚠️ Error: {str(e)}")
-
     users = get_all_users()
     logs = get_sms_logs()
-    return render_template('admin_panel.html', users=users or [], logs=logs or [])
+    return render_template('admin_panel.html', users=users, logs=logs)
 
 if __name__ == "__main__":
     app.run(debug=True)
