@@ -4,10 +4,14 @@ services:
     env: python
     plan: free
     buildCommand: ""
-    startCommand: gunicorn app:app
+    startCommand: gunicorn main:app
     envVars:
       - key: FLASK_ENV
         value: production
+      - key: FLASK_SECRET_KEY
+        value: your_super_secret_key_here
+      - key: SMS_API_URL
+        value: https://api.crownone.app/api/v1/Registration/verifysms
       - key: DATABASE_URL
         value: postgresql://sms_db_5ifm_user:A2oJ2caHlym0fLu8j2RgQBzyEZk3nVGH@dpg-d18p6fili9vc73fr1mg0-a/sms_db_5ifm
     disk:
