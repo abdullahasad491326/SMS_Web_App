@@ -19,6 +19,15 @@
       background-color: rgba(255, 255, 255, 0.1);
       border-radius: 10px;
     }
+
+    .scroll-card {
+      max-height: 300px;
+      overflow-y: auto;
+      border-radius: 10px;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.05);
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -44,41 +53,45 @@
       <div class="section">
         <h3>📋 Users</h3>
         <input type="text" class="search-input" placeholder="🔍 Search user..." onkeyup="searchTable('userTable', this.value)">
-        <table id="userTable" class="data-table">
-          <tr>
-            <th>📱 Phone</th>
-            <th>🪙 Coins</th>
-            <th>📊 Status</th>
-          </tr>
-          {% for u in users %}
+        <div class="scroll-card">
+          <table id="userTable" class="data-table">
             <tr>
-              <td>{{ u[0] }}</td>
-              <td>{{ u[2] }}</td>
-              <td>{% if u[3] == 1 %} 🚫 Blocked {% else %} ✅ Active {% endif %}</td>
+              <th>📱 Phone</th>
+              <th>🪙 Coins</th>
+              <th>📊 Status</th>
             </tr>
-          {% endfor %}
-        </table>
+            {% for u in users %}
+              <tr>
+                <td>{{ u[0] }}</td>
+                <td>{{ u[2] }}</td>
+                <td>{% if u[3] == 1 %} 🚫 Blocked {% else %} ✅ Active {% endif %}</td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
       </div>
 
       <div class="section">
         <h3>📨 Message Logs</h3>
         <input type="text" class="search-input" placeholder="🔍 Search message logs..." onkeyup="searchTable('logTable', this.value)">
-        <table id="logTable" class="data-table">
-          <tr>
-            <th>👤 User</th>
-            <th>📞 To</th>
-            <th>💬 Message</th>
-            <th>🕒 Time</th>
-          </tr>
-          {% for l in logs %}
+        <div class="scroll-card">
+          <table id="logTable" class="data-table">
             <tr>
-              <td>{{ l[1] }}</td>
-              <td>{{ l[2] }}</td>
-              <td>{{ l[3] }}</td>
-              <td>{{ l[4] }}</td>
+              <th>👤 User</th>
+              <th>📞 To</th>
+              <th>💬 Message</th>
+              <th>🕒 Time</th>
             </tr>
-          {% endfor %}
-        </table>
+            {% for l in logs %}
+              <tr>
+                <td>{{ l[1] }}</td>
+                <td>{{ l[2] }}</td>
+                <td>{{ l[3] }}</td>
+                <td>{{ l[4] }}</td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
       </div>
 
       <a href="/logout"><button>🔒 Logout</button></a>
