@@ -1,8 +1,7 @@
 import psycopg2
-from datetime import datetime
 import os
 
-DB_URL = os.getenv("postgresql://sms_db_5ifm_user:A2oJ2caHlym0fLu8j2RgQBzyEZk3nVGH@dpg-d18p6fili9vc73fr1mg0-a/sms_db_5ifm")
+DB_URL = os.getenv("DATABASE_URL")  # proper usage
 
 def get_conn():
     return psycopg2.connect(DB_URL, sslmode='require')
@@ -10,7 +9,6 @@ def get_conn():
 def init_db():
     conn = get_conn()
     cur = conn.cursor()
-
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             phone TEXT PRIMARY KEY,
@@ -19,7 +17,6 @@ def init_db():
             blocked BOOLEAN DEFAULT FALSE
         )
     """)
-
     cur.execute("""
         CREATE TABLE IF NOT EXISTS messages (
             id SERIAL PRIMARY KEY,
@@ -29,11 +26,11 @@ def init_db():
             time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
-
     conn.commit()
     cur.close()
     conn.close()
 
+# CRUD functions...
 def add_user(phone, password):
     conn = get_conn()
     cur = conn.cursor()
