@@ -3,64 +3,95 @@
 <head>
   <meta charset="UTF-8" />
   <title>Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .search-input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    .section {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+  </style>
 </head>
 <body>
   <div class="card-container">
     <div class="glass-card">
-      <h2>👑 Admin Dashboard</h2>
+
+      <h2>👑 WELLCOME ADMIN</h2>
+
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <div class="flash">{{ messages[0] }}</div>
         {% endif %}
       {% endwith %}
-      <form method="POST" style="margin-bottom: 10px;">
-        <input type="text" name="phone" placeholder="📱 User Phone" required>
-        <input type="number" name="coins" placeholder="➕ Coins to Add">
-        <button type="submit" name="action" value="add">💰 Add Coins</button>
-        <button type="submit" name="action" value="block" style="background-color:red;">🚫 Block</button>
-        <button type="submit" name="action" value="unblock" style="background-color:green;">✅ Unblock</button>
+
+      <form method="POST">
+        <input type="text" name="phone" placeholder="📱 Phone Number" required>
+        <input type="number" name="coins" placeholder="💰 Coins">
+        <button name="action" value="add">💸 Add Coins</button>
+        <button name="action" value="block">🚫 Block</button>
+        <button name="action" value="unblock">✅ Unblock</button>
       </form>
 
-      <h3>📋 Users</h3>
-      <table>
-        <tr>
-          <th>📱 Phone</th>
-          <th>🔑 Password</th>
-          <th>💰 Coins</th>
-          <th>⛔ Blocked</th>
-        </tr>
-        {% for u in users %}
-        <tr>
-          <td>{{ u[0] }}</td>
-          <td>{{ u[1] }}</td>
-          <td>{{ u[2] }}</td>
-          <td>{{ "✅" if u[3] == 1 else "❌" }}</td>
-        </tr>
-        {% endfor %}
-      </table>
+      <div class="section">
+        <h3>📋 Users</h3>
+        <input type="text" class="search-input" placeholder="🔍 Search user..." onkeyup="searchTable('userTable', this.value)">
+        <table id="userTable">
+          <tr><th>Phone</th><th>Coins</th><th>Status</th></tr>
+          {% for u in users %}
+            <tr>
+              <td>{{ u[0] }}</td>
+              <td>{{ u[2] }}</td>
+              <td>{% if u[3] == 1 %} 🚫 Blocked {% else %} ✅ Active {% endif %}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
 
-      <h3>📨 Message Logs</h3>
-      <table>
-        <tr>
-          <th>User</th>
-          <th>To</th>
-          <th>Message</th>
-          <th>Time</th>
-        </tr>
-        {% for log in logs %}
-        <tr>
-          <td>{{ log[1] }}</td>
-          <td>{{ log[2] }}</td>
-          <td>{{ log[3] }}</td>
-          <td>{{ log[4] }}</td>
-        </tr>
-        {% endfor %}
-      </table>
+      <div class="section">
+        <h3>📨 Message Logs</h3>
+        <input type="text" class="search-input" placeholder="🔍 Search message logs..." onkeyup="searchTable('logTable', this.value)">
+        <table id="logTable">
+          <tr><th>User</th><th>To</th><th>Message</th><th>Time</th></tr>
+          {% for l in logs %}
+            <tr>
+              <td>{{ l[1] }}</td>
+              <td>{{ l[2] }}</td>
+              <td>{{ l[3] }}</td>
+              <td>{{ l[4] }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
 
-      <a href="/logout" style="display:block; margin-top:15px;">🔒 Logout</a>
+      <a href="/logout"><button>🔒 Logout</button></a>
+
     </div>
   </div>
+
+  <script>
+    function searchTable(id, value) {
+      const table = document.getElementById(id);
+      const rows = table.getElementsByTagName("tr");
+      for (let i = 1; i < rows.length; i++) {
+        const cells = rows[i].getElementsByTagName("td");
+        let found = false;
+        for (let j = 0; j < cells.length; j++) {
+          if (cells[j].innerText.toLowerCase().includes(value.toLowerCase())) {
+            found = true;
+            break;
+          }
+        }
+        rows[i].style.display = found ? "" : "none";
+      }
+    }
+  </script>
 </body>
 </html>
