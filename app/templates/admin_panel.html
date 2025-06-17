@@ -12,6 +12,7 @@
       margin-bottom: 10px;
       font-size: 16px;
     }
+
     .section {
       margin: 20px 0;
       padding: 15px;
@@ -43,8 +44,12 @@
       <div class="section">
         <h3>📋 Users</h3>
         <input type="text" class="search-input" placeholder="🔍 Search user..." onkeyup="searchTable('userTable', this.value)">
-        <table id="userTable">
-          <tr><th>Phone</th><th>Coins</th><th>Status</th></tr>
+        <table id="userTable" class="data-table">
+          <tr>
+            <th>📱 Phone</th>
+            <th>🪙 Coins</th>
+            <th>📊 Status</th>
+          </tr>
           {% for u in users %}
             <tr>
               <td>{{ u[0] }}</td>
@@ -58,8 +63,13 @@
       <div class="section">
         <h3>📨 Message Logs</h3>
         <input type="text" class="search-input" placeholder="🔍 Search message logs..." onkeyup="searchTable('logTable', this.value)">
-        <table id="logTable">
-          <tr><th>User</th><th>To</th><th>Message</th><th>Time</th></tr>
+        <table id="logTable" class="data-table">
+          <tr>
+            <th>👤 User</th>
+            <th>📞 To</th>
+            <th>💬 Message</th>
+            <th>🕒 Time</th>
+          </tr>
           {% for l in logs %}
             <tr>
               <td>{{ l[1] }}</td>
