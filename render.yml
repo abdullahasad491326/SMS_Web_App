@@ -8,6 +8,8 @@ services:
     envVars:
       - key: FLASK_ENV
         value: production
+      - key: DATABASE_URL
+        value: postgresql://sms_db_5ifm_user:A2oJ2caHlym0fLu8j2RgQBzyEZk3nVGH@dpg-d18p6fili9vc73fr1mg0-a/sms_db_5ifm
     disk:
       name: data-disk
       mountPath: /data
