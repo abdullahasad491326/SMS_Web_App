@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request, redirect, session, flash
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -10,6 +11,7 @@ from database import (
     get_all_users, get_sms_logs
 )
 
+# Initialize the database only once when app starts
 init_db()
 
 app = Flask(__name__)
@@ -26,8 +28,8 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        phone = request.form['phone']
-        password = request.form['password']
+        phone = request.form['phone'].strip()
+        password = request.form['password'].strip()
         if get_user(phone):
             flash("❌ User already exists.")
         else:
@@ -39,8 +41,8 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        phone = request.form['phone']
-        password = request.form['password']
+        phone = request.form['phone'].strip()
+        password = request.form['password'].strip()
         if validate_user(phone, password):
             session['user'] = phone
             flash("✅ Login successful.")
@@ -62,8 +64,8 @@ def dashboard():
 
     coins = get_user_coins(phone)
     if request.method == 'POST':
-        to = request.form['to']
-        message = request.form['message']
+        to = request.form['to'].strip()
+        message = request.form['message'].strip()
         if coins <= 0:
             flash("💸 Not enough coins.")
         else:
@@ -86,8 +88,9 @@ def dashboard():
                     flash("✅ Message sent successfully.")
                 else:
                     flash("❌ Failed to send.")
-            except:
-                flash("⚠️ Network error while sending.")
+            except Exception as e:
+                flash(f"⚠️ Error: {str(e)}")
+
     return render_template('dashboard.html', coins=get_user_coins(phone))
 
 @app.route('/logout')
@@ -98,8 +101,8 @@ def logout():
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form['username'].strip()
+        password = request.form['password'].strip()
         if username == ADMIN_USER and password == ADMIN_PASS:
             session['admin'] = username
             return redirect('/admin_panel')
@@ -111,11 +114,10 @@ def admin_login():
 def admin_panel():
     if 'admin' not in session:
         return redirect('/admin_login')
-    
+
     if request.method == 'POST':
         action = request.form.get('action')
         phone = request.form.get('phone', '').strip()
-
         try:
             if action == "add":
                 coins_str = request.form.get('coins', '0').strip()
