@@ -1,7 +1,8 @@
 import psycopg2
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
 
-DB_URL = os.getenv("DATABASE_URL")  # proper usage
+DB_URL = os.getenv("DATABASE_URL")  # Ensure this is set in your environment
 
 def get_conn():
     return psycopg2.connect(DB_URL, sslmode='require')
@@ -30,11 +31,11 @@ def init_db():
     cur.close()
     conn.close()
 
-# CRUD functions...
 def add_user(phone, password):
     conn = get_conn()
     cur = conn.cursor()
-    cur.execute("INSERT INTO users (phone, password) VALUES (%s, %s)", (phone, password))
+    hashed_pw = generate_password_hash(password)
+    cur.execute("INSERT INTO users (phone, password) VALUES (%s, %s)", (phone, hashed_pw))
     conn.commit()
     cur.close()
     conn.close()
@@ -51,11 +52,13 @@ def get_user(phone):
 def validate_user(phone, password):
     conn = get_conn()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM users WHERE phone = %s AND password = %s", (phone, password))
-    user = cur.fetchone()
+    cur.execute("SELECT password FROM users WHERE phone = %s", (phone,))
+    row = cur.fetchone()
     cur.close()
     conn.close()
-    return user
+    if row:
+        return check_password_hash(row[0], password)
+    return False
 
 def get_user_coins(phone):
     conn = get_conn()
@@ -124,3 +127,4 @@ def get_sms_logs():
     cur.close()
     conn.close()
     return logs
+    
