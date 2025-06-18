@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, session, flash
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import requests
+import os
 from database import (
     init_db, get_user, add_user, validate_user,
     get_user_coins, update_user_coins, log_sms,
@@ -9,15 +10,17 @@ from database import (
     get_all_users, get_sms_logs
 )
 
-# Initialize
+# Initialize database
 init_db()
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "fallback_secret")
 limiter = Limiter(get_remote_address, app=app)
 
-ADMIN_USERNAME = "PAKCYBER"
-ADMIN_PASSWORD = "24113576"
+# Configs from env
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "password")
+SMS_API_URL = os.getenv("SMS_API_URL", "https://api.crownone.app/api/v1/Registration/verifysms")
 
 @app.route('/')
 def home():
@@ -32,7 +35,7 @@ def register():
             flash("❌ User already exists.")
         else:
             add_user(phone, password)
-            flash("✅ Account created!")
+            flash("✅ Account created successfully.")
             return redirect('/login')
     return render_template('register.html')
 
@@ -54,38 +57,43 @@ def login():
 def dashboard():
     if 'user' not in session:
         return redirect('/login')
+
     phone = session['user']
+    coins = get_user_coins(phone)
+
     if is_blocked(phone):
         flash("🚫 You are blocked from sending SMS.")
         return render_template('dashboard.html', coins=0)
 
-    coins = get_user_coins(phone)
     if request.method == 'POST':
         to = request.form['to'].strip()
         message = request.form['message'].strip()
         if coins <= 0:
             flash("💸 Not enough coins.")
         else:
-            payload = {"Code": 1234, "Mobile": to, "Message": message}
+            payload = {
+                "Code": 1234,
+                "Mobile": to,
+                "Message": message
+            }
             headers = {
                 "accept": "application/json",
                 "content-type": "application/json",
                 "user-agent": "okhttp/4.9.2"
             }
             try:
-                res = requests.post(
-                    "https://api.crownone.app/api/v1/Registration/verifysms",
-                    json=payload, headers=headers, timeout=10
-                )
+                res = requests.post(SMS_API_URL, json=payload, headers=headers, timeout=10)
                 if res.status_code == 200:
                     update_user_coins(phone, coins - 1)
                     log_sms(phone, to, message)
                     flash("✅ Message sent successfully.")
                 else:
-                    flash("❌ Failed to send.")
+                    flash(f"❌ Failed to send message. Code: {res.status_code}")
             except Exception as e:
                 flash(f"⚠️ Error: {str(e)}")
-    return render_template('dashboard.html', coins=get_user_coins(phone))
+
+    coins = get_user_coins(phone)
+    return render_template('dashboard.html', coins=coins)
 
 @app.route('/logout')
 def logout():
@@ -97,7 +105,7 @@ def admin_login():
     if request.method == 'POST':
         username = request.form['username'].strip()
         password = request.form['password'].strip()
-        if username == ADMIN_USER and password == ADMIN_PASS:
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             session['admin'] = username
             return redirect('/admin_panel')
         else:
@@ -108,9 +116,11 @@ def admin_login():
 def admin_panel():
     if 'admin' not in session:
         return redirect('/admin_login')
+
     if request.method == 'POST':
         action = request.form.get('action')
         phone = request.form.get('phone', '').strip()
+
         try:
             if action == "add":
                 coins = int(request.form.get('coins', '0').strip() or 0)
@@ -125,6 +135,7 @@ def admin_panel():
                 flash(f"✅ {phone} unblocked.")
         except Exception as e:
             flash(f"⚠️ Error: {str(e)}")
+
     users = get_all_users()
     logs = get_sms_logs()
     return render_template('admin_panel.html', users=users, logs=logs)
